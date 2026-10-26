@@ -4,20 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X Mark's the Spot</title>
+    
 </head>
 <body>
     <header>
-        <section id="nav-placeholder"></section>
+        
     </header>
+
+    <nav>
+        <ul class="nav-links">
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="/">Upload Design</a></li>
+            <li><a href="./try-on.html">Try-on</a></li>
+        </ul>
+    </nav>
 
     <main>
         <section class="upload-section">
             <div class="img-upload">
                 <h2>Upload your Design</h2>
-                <input type="file" name="image" accept="image/jpeg, image/png, image/jpg">
+                <label for="input-file" id="drop-area">
+                    <input type="file" id="input-file" accept="image/jpeg, image/png, image/jpg">
+
+                    <div id="img-view">
+                        <p>Drag and drop your image here</p>
+                        <p>or</p>
+                        <button type="button" id="uploadBtn">Select Image</button>
+                    </div>
+                </label>
+
                 <button type="submit">Convert to Stencil</button>
             </div>
         </section>
+
 
         <section class="flash-wall">
             <h2>Flash Wall</h2>
@@ -33,6 +52,10 @@
                     </div>
                 </div>
         </section>
+
+    </main>
+
+    <script src="./javascript/main.js" defer></script>
 
 </body>
 </html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+</head>
+
+<body>
+    <nav>
+        <ul class="nav-links">
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="./upload.html">Upload Design</a></li>
+            <li><a href="/">Try-on</a></li>
+        </ul>
+    </nav>
+
+<main>
+    <section class="left-column">
+        <div class="transform-tools">
+            <h2>Transform</h2>
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        </div>
+
+        <div class="rotation-tools">
+            <h2>Rotation</h2>
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        </div>
+
+        <div class="scale-tools">
+            <h2>Scale</h2>
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        </div>
+
+        <div class="undo-redo">
+            <h2>Undo/Redo</h2>
+            <button id="undo-button">Undo</button>
+            <button id="redo-button">Redo</button>
+        </div>
+    </section>
+
+    <section class="try-on-container">
+
+    </section>
+
+    <section class="right-column">
+        <div class="body-area-dropdown">
+            <h2>Select Body Area</h2>
+            <img src="" alt="Select Body Area" id="imgBodyArea">
+            <select id="body-area-select" onchange="updateImage()">
+                <option value="torso">Torso</option>
+                <option value="back">Back</option>
+                <option value="knuckles">Knuckles</option>
+            </select>
+        </div>
+
+        <div class="skin-tone">
+            <h2>Skin Tone</h2>
+            <button onclick="changeSkinTone('light')">Light</button>
+            <button onclick="changeSkinTone('medium')">Medium</button>
+            <button onclick="changeSkinTone('dark')">Dark</button>
+        </div>
+
+    </section>
+
+    <script src="./javascript/main.js" defer></script>
+
+</body>
+</html>
