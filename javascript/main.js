@@ -24,6 +24,11 @@ const bodyAreaImages = {
 
     let currentSkinTone = 'greyscale'; // default
 
+    function changeSkinTone(tone) {
+    currentSkinTone = tone;
+    updateImage();
+}
+
     function updateImage() {
         const select = document.getElementById('body-area-select');
         const img = document.getElementById('imgBodyArea');
@@ -50,5 +55,16 @@ inputFile.addEventListener('change', uploadImage);
 function uploadImage() {
     let imgLink = URL.createObjectURL (inputFile.files[0]); /* create image link */
     imageView.style.backgroundImage = `url(${imgLink})`; /* set image as background */
+    imageView.textContent = ''; 
+    imageView.style.border = 0; 
 }
 
+dropArea.addEventListener('dragover', (event) => {
+    event.preventDefault();
+});
+
+dropArea.addEventListener('drop', (event) => {
+    event.preventDefault();
+    inputFile.files = event.dataTransfer.files;
+    uploadImage();
+});
