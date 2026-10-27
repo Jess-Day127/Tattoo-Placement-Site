@@ -1,9 +1,3 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 .img-upload{
     display: flex;
     align-items: center;
@@ -40,12 +34,12 @@
   --radius: 8px;
 }
 
-body {
+/*body {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-}
+}*/
 
 .bento-grid {
   display: grid;
@@ -119,3 +113,54 @@ body {
   border-color: transparent;
   z-index: 10;
 }
+
+.try-on-area {
+    position: relative;
+    display: inline-block;
+    line-height: 0;          /* kills the inline-image gap under the picture */
+    touch-action: none;       /* disables pinch-zoom and double-tap zoom on mobile */
+}
+
+#imgBodyArea {
+    display: block;
+    max-width: 100%;
+}
+
+#imgStencil {
+    position: absolute;
+    top: 30%;
+    left: 35%;
+    width: 30%;
+    height: auto;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: none;
+    outline: 2px dashed transparent;
+    outline-offset: 4px;
+}
+
+#imgStencil.selected {
+    outline-color: #4a90d9;
+    cursor: move;
+}
+
+.resize-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    background: #4a90d9;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: nwse-resize;
+    touch-action: none;
+    z-index: 10;
+    display: none;          /* hidden until selected */
+}
+
+.resize-handle.visible {
+    display: block;
+}
+

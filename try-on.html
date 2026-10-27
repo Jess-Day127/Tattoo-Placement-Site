@@ -19,6 +19,7 @@
     </nav>
 
 <main>
+
     <section class="left-column">
         <div class="transform-tools">
             <h2>Transform</h2>
@@ -45,13 +46,17 @@
     </section>
 
     <section class="try-on-container">
-
+        <h2>Try On</h2>
+        <div class="try-on-area">
+            <img id="imgBodyArea" alt="Body area">
+            <img id="imgStencil" alt="Your design">
+        </div>
     </section>
 
     <section class="right-column">
         <div class="body-area-dropdown">
             <h2>Select Body Area</h2>
-            <img src="" alt="Select Body Area" id="imgBodyArea">
+            <img src="" alt="Select Body Area" id="imgBodyAreaPreview">
             <select id="body-area-select" onchange="updateImage()">
                 <option value="torso">Torso</option>
                 <option value="back">Back</option>
@@ -65,10 +70,17 @@
             <button onclick="changeSkinTone('medium')">Medium</button>
             <button onclick="changeSkinTone('dark')">Dark</button>
         </div>
-
     </section>
 
-    <script src="./javascript/main.js" defer></script>
 
+    <script src="./javascript/gsap.min.js" defer></script>
+
+    <script src="./javascript/Flip.min.js" defer></script>
+    <script src="./javascript/Draggable.min.js" defer></script>
+    <script src="./javascript/ScrollTrigger.min.js" defer></script>
+
+    <script src="./javascript/body.area.js" defer></script>
+    <script src="./javascript/gsap.js" defer></script>
+    
 </body>
 </html>
