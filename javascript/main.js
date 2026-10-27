@@ -1,3 +1,4 @@
+/* Img upload & API bg removal */
 const dropArea = document.getElementById('drop-area');
 const inputFile = document.getElementById('input-file');
 const imageView = document.getElementById('img-view');
@@ -72,7 +73,6 @@ if (dropArea && inputFile && imageView && removeBtn) {
 }
 
 
-
 /*Body Area Images*/
 const bodyAreaImages = {
         torso: {
@@ -117,3 +117,4 @@ const bodyAreaImages = {
     if (document.getElementById('body-area-select')) {
     updateImage();
 }
+
