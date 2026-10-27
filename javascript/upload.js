@@ -22,8 +22,11 @@ if (dropArea && inputFile && imageView) {
 
     dropArea.addEventListener('drop', (event) => {
         event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        if (!file) return;
+
         const dt = new DataTransfer();
-        dt.items.add(event.dataTransfer.files[0]);
+        dt.items.add(file);
         inputFile.files = dt.files;
         uploadImage();
     });

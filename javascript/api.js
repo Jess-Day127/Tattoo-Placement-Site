@@ -74,7 +74,9 @@
             alert('Background removal failed: ' + err.message);
         } finally {
             removeBtn.disabled = false;
-            removeBtn.textContent = 'Remove Background';
+            removeBtn.textContent = 'Convert to Stencil';
         }
     });
 })();
+
+

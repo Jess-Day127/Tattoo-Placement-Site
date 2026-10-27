@@ -136,8 +136,8 @@
     user-select: none;
     -webkit-user-drag: none;
     touch-action: none;
-    outline: 2px dashed transparent;
-    outline-offset: 4px;
+    outline: 3px dashed transparent;
+    outline-offset: 7px;
 }
 
 #imgStencil.selected {
@@ -164,3 +164,26 @@
     display: block;
 }
 
+
+.rotate-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 2px solid #4a90d9;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    z-index: 10;
+    display: none;
+}
+
+.rotate-handle.visible {
+    display: block;
+}
+
+.rotate-handle:active {
+    cursor: grabbing;
+}

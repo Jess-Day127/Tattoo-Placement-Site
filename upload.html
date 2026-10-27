@@ -25,14 +25,16 @@
         <section class="upload-section">
             <div class="img-upload">
                 <h2>Upload your Design</h2>
-                <label for="input-file" id="drop-area">
-                    <input type="file" id="input-file" accept="image/jpeg, image/png, image/jpg" hidden>
+                <div id="drop-area">
+                    <label for="input-file">
+                        <input type="file" id="input-file" accept="image/jpeg, image/png, image/jpg" hidden>
 
-                    <div id="img-view">
-                        <img src="./assets/upload.png" alt="">
-                        <p>Drag and drop or click here to upload your design</p>
-                    </div>
-                </label>
+                        <div id="img-view">
+                            <img src="./assets/upload.png" alt="">
+                            <p>Drag and drop or click here to upload your design</p>
+                        </div>
+                    </label>
+                </div>
 
                 <button type="button" id="removeBgBtn" disabled>Convert to Stencil</button>
                 <a href="./try-on.html" id="tryOnBtn" style="display: none;">Try On</a>
@@ -154,6 +156,11 @@
         </section>
 
     </main>
+
+    <footer>
+        <p>This is a virtual preview. Results may vary.</p>
+        <p>&copy; 2026 X Mark's the Spot All rights reserved.</p>
+    </footer>
 
     <script src="./javascript/gsap.min.js" defer></script>
 

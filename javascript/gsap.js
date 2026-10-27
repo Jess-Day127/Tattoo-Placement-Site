@@ -58,38 +58,72 @@ gsap.registerPlugin(Draggable);
     const stencil = document.getElementById('imgStencil');
     if (!stage || !stencil) return;
 
-    const handle = document.createElement('div');
-    handle.className = 'resize-handle';
-    stage.appendChild(handle);
+    // --- handles ---
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'resize-handle';
+    stage.appendChild(resizeHandle);
 
-    function positionHandle() {
-        gsap.set(handle, {
-            x: stencil.offsetLeft + stencil.offsetWidth - 8,
-            y: stencil.offsetTop + stencil.offsetHeight - 8,
+    const rotateHandle = document.createElement('div');
+    rotateHandle.className = 'rotate-handle';
+    stage.appendChild(rotateHandle);
+
+    // --- positioning ---
+    // The stencil rotates about its centre, so both handles are placed
+    // by rotating their offset from that centre by the same angle.
+    function positionHandles() {
+        const stageRect = stage.getBoundingClientRect();
+        const sRect = stencil.getBoundingClientRect();
+
+        const cx = sRect.left + sRect.width / 2 - stageRect.left;
+        const cy = sRect.top + sRect.height / 2 - stageRect.top;
+
+        const angle = gsap.getProperty(stencil, 'rotation') * Math.PI / 180;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+
+        // bottom-right corner, 8px out
+        const rx = sRect.width / 2 + 8;
+        const ry = sRect.height / 2 + 8;
+        gsap.set(resizeHandle, {
+            x: cx + rx * cos - ry * sin - 8,
+            y: cy + rx * sin + ry * cos - 8,
+        });
+
+        // above the top edge, 28px out
+        const ty = -(sRect.height / 2 + 28);
+        gsap.set(rotateHandle, {
+            x: cx - ty * sin - 8,
+            y: cy + ty * cos - 8,
         });
     }
 
+    // --- selection ---
     function select() {
         stencil.classList.add('selected');
-        handle.classList.add('visible');
-        positionHandle();
+        resizeHandle.classList.add('visible');
+        rotateHandle.classList.add('visible');
+        positionHandles();
     }
 
     function deselect() {
         stencil.classList.remove('selected');
-        handle.classList.remove('visible');
+        resizeHandle.classList.remove('visible');
+        rotateHandle.classList.remove('visible');
     }
 
-    // click the stencil → select
     stencil.addEventListener('pointerdown', select);
 
-    // click anywhere else → deselect
     document.addEventListener('pointerdown', (e) => {
-        if (!stencil.contains(e.target) && !handle.contains(e.target)) {
+        if (
+            !stencil.contains(e.target) &&
+            !resizeHandle.contains(e.target) &&
+            !rotateHandle.contains(e.target)
+        ) {
             deselect();
         }
     });
 
+    // --- drag ---
     Draggable.create(stencil, {
         type: 'x,y',
         bounds: stage,
@@ -97,23 +131,60 @@ gsap.registerPlugin(Draggable);
             select();
             gsap.set(stencil, { zIndex: 5 });
         },
-        onDrag: positionHandle,
-        onRelease: positionHandle,
+        onDrag: positionHandles,
+        onRelease: positionHandles,
     });
 
-    Draggable.create(handle, {
+    // --- resize ---
+    Draggable.create(resizeHandle, {
         type: 'x,y',
         onPress(e) {
             e.stopPropagation();
         },
         onDrag(e) {
             const rect = stencil.getBoundingClientRect();
-            const w = Math.max(40, e.clientX - rect.left);
+            const angle = gsap.getProperty(stencil, 'rotation') * Math.PI / 180;
+
+            // project the pointer onto the stencil's own rotated x-axis
+            const dx = e.clientX - (rect.left + rect.width / 2);
+            const dy = e.clientY - (rect.top + rect.height / 2);
+            const localX = dx * Math.cos(-angle) - dy * Math.sin(-angle);
+
+            const w = Math.max(40, localX * 2);
             gsap.set(stencil, { width: w });
-            positionHandle();
+            positionHandles();
         },
     });
 
-    new ResizeObserver(positionHandle).observe(stencil);
-    positionHandle();
+    // --- rotate ---
+    let startAngle = 0;
+    let startRotation = 0;
+
+    Draggable.create(rotateHandle, {
+        type: 'x,y',
+        onPress(e) {
+            e.stopPropagation();
+            const rect = stencil.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
+            startRotation = gsap.getProperty(stencil, 'rotation');
+            gsap.set(stencil, { transformOrigin: 'center center' });
+        },
+        onDrag(e) {
+            const rect = stencil.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            const now = Math.atan2(e.clientY - cy, e.clientX - cx);
+            const delta = (now - startAngle) * 180 / Math.PI;
+
+            gsap.set(stencil, { rotation: startRotation + delta });
+            positionHandles();
+        },
+    });
+
+    new ResizeObserver(positionHandles).observe(stencil);
+    positionHandles();
 })();
