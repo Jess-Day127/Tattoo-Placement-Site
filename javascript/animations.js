@@ -16,7 +16,6 @@ gsap.set(".bento-grid .item:not(.selected) .description", {
 
 let state;
 items.forEach((e, i) => {
-  // Add click event listener only to the non selected items
   if (!e.classList.contains("selected")) {
     e.addEventListener("click", () => {
       const content = e.querySelector(".item-content");
@@ -59,7 +58,6 @@ gsap.registerPlugin(Draggable);
     const stencil = document.getElementById('imgStencil');
     if (!stage || !stencil) return;
 
-    // --- handles ---
     const resizeHandle = document.createElement('div');
     resizeHandle.className = 'resize-handle';
     stage.appendChild(resizeHandle);
@@ -68,9 +66,6 @@ gsap.registerPlugin(Draggable);
     rotateHandle.className = 'rotate-handle';
     stage.appendChild(rotateHandle);
 
-    // --- positioning ---
-    // The stencil rotates about its centre, so both handles are placed
-    // by rotating their offset from that centre by the same angle.
     function positionHandles() {
         const stageRect = stage.getBoundingClientRect();
         const sRect = stencil.getBoundingClientRect();
@@ -82,7 +77,6 @@ gsap.registerPlugin(Draggable);
         const cos = Math.cos(angle);
         const sin = Math.sin(angle);
 
-        // bottom-right corner, 8px out
         const rx = sRect.width / 2 + 8;
         const ry = sRect.height / 2 + 8;
         gsap.set(resizeHandle, {
@@ -90,7 +84,6 @@ gsap.registerPlugin(Draggable);
             y: cy + rx * sin + ry * cos - 8,
         });
 
-        // above the top edge, 28px out
         const ty = -(sRect.height / 2 + 28);
         gsap.set(rotateHandle, {
             x: cx - ty * sin - 8,
@@ -98,8 +91,6 @@ gsap.registerPlugin(Draggable);
         });
     }
 
-
-    // --- drag ---
     Draggable.create(stencil, {
         type: 'x,y',
         bounds: stage,
@@ -111,7 +102,6 @@ gsap.registerPlugin(Draggable);
         onRelease: positionHandles,
     });
 
-    // --- resize ---
     Draggable.create(resizeHandle, {
         type: 'x,y',
         onPress(e) {
@@ -121,7 +111,6 @@ gsap.registerPlugin(Draggable);
             const rect = stencil.getBoundingClientRect();
             const angle = gsap.getProperty(stencil, 'rotation') * Math.PI / 180;
 
-            // project the pointer onto the stencil's own rotated x-axis
             const dx = e.clientX - (rect.left + rect.width / 2);
             const dy = e.clientY - (rect.top + rect.height / 2);
             const localX = dx * Math.cos(-angle) - dy * Math.sin(-angle);
