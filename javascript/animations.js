@@ -1,3 +1,4 @@
+
 gsap.registerPlugin(Flip, ScrollTrigger, Draggable); 
 
 
@@ -97,31 +98,6 @@ gsap.registerPlugin(Draggable);
         });
     }
 
-    // --- selection ---
-    function select() {
-        stencil.classList.add('selected');
-        resizeHandle.classList.add('visible');
-        rotateHandle.classList.add('visible');
-        positionHandles();
-    }
-
-    function deselect() {
-        stencil.classList.remove('selected');
-        resizeHandle.classList.remove('visible');
-        rotateHandle.classList.remove('visible');
-    }
-
-    stencil.addEventListener('pointerdown', select);
-
-    document.addEventListener('pointerdown', (e) => {
-        if (
-            !stencil.contains(e.target) &&
-            !resizeHandle.contains(e.target) &&
-            !rotateHandle.contains(e.target)
-        ) {
-            deselect();
-        }
-    });
 
     // --- drag ---
     Draggable.create(stencil, {
@@ -155,36 +131,4 @@ gsap.registerPlugin(Draggable);
             positionHandles();
         },
     });
-
-    // --- rotate ---
-    let startAngle = 0;
-    let startRotation = 0;
-
-    Draggable.create(rotateHandle, {
-        type: 'x,y',
-        onPress(e) {
-            e.stopPropagation();
-            const rect = stencil.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-
-            startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
-            startRotation = gsap.getProperty(stencil, 'rotation');
-            gsap.set(stencil, { transformOrigin: 'center center' });
-        },
-        onDrag(e) {
-            const rect = stencil.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-
-            const now = Math.atan2(e.clientY - cy, e.clientX - cx);
-            const delta = (now - startAngle) * 180 / Math.PI;
-
-            gsap.set(stencil, { rotation: startRotation + delta });
-            positionHandles();
-        },
-    });
-
-    new ResizeObserver(positionHandles).observe(stencil);
-    positionHandles();
 })();
