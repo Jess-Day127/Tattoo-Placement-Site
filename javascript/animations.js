@@ -1,10 +1,9 @@
 
-gsap.registerPlugin(Flip, ScrollTrigger, Draggable); 
+gsap.registerPlugin(Flip, Draggable); 
 
 
 /* Features Bento Grid */
 console.clear();
-
 gsap.registerPlugin(Flip);
 
 const items = gsap.utils.toArray(".bento-grid .item");
@@ -16,6 +15,7 @@ gsap.set(".bento-grid .item:not(.selected) .description", {
 
 let state;
 items.forEach((e, i) => {
+  // Add click event listener only to the non selected items
   if (!e.classList.contains("selected")) {
     e.addEventListener("click", () => {
       const content = e.querySelector(".item-content");
@@ -49,6 +49,7 @@ items.forEach((e, i) => {
     });
   }
 });
+
 
 /* Draggable + resize */
 gsap.registerPlugin(Draggable);
