@@ -24,7 +24,8 @@ const bodyAreaImages = {
     };
 
     let currentSkinTone = 'greyscale'; // default
-    let stencilImage = sessionStorage.getItem('stencilImage');
+    let stencilImage = sessionStorage.getItem('stencil');
+    const stencil = document.getElementById('imgStencil');
 
     function changeSkinTone(tone) {
     currentSkinTone = tone;
@@ -42,75 +43,16 @@ function updateImage() {
     img.src = area[currentSkinTone] ?? area.light;
 }
 
+const stencilBox = document.getElementById('stencilBox');
+const stencilImg = document.getElementById('imgStencil');
+
 function showStencil() {
-    const stencil = document.getElementById('imgStencil');
-    if (!stencil || !stencilImage) return;
+    if (!stencilBox || !stencilImg || !stencilImage) return;
 
-    stencil.src = stencilImage;
-    stencil.style.display = 'block';
+    stencilImg.src = stencilImage;
+    stencilBox.style.display = 'block';
 }
-
 if (document.getElementById('body-area-select')) {
     updateImage();
     showStencil();
 }
-
-
-
-    // Select Design
-    function select() {
-        stencil.classList.add('selected');
-        resizeHandle.classList.add('visible');
-        rotateHandle.classList.add('visible');
-        positionHandles();
-    }
-
-    function deselect() {
-        stencil.classList.remove('selected');
-        resizeHandle.classList.remove('visible');
-        rotateHandle.classList.remove('visible');
-    }
-
-    stencil.addEventListener('pointerdown', select);
-
-    document.addEventListener('pointerdown', (e) => {
-        if (
-            !stencil.contains(e.target) &&
-            !resizeHandle.contains(e.target) &&
-            !rotateHandle.contains(e.target)
-        ) {
-            deselect();
-        }
-    });
-
-    // Rotate Design
-    let startAngle = 0;
-    let startRotation = 0;
-
-    Draggable.create(rotateHandle, {
-        type: 'x,y',
-        onPress(e) {
-            e.stopPropagation();
-            const rect = stencil.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-
-            startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
-            startRotation = gsap.getProperty(stencil, 'rotation');
-            gsap.set(stencil, { transformOrigin: 'center center' });
-        },
-        onDrag(e) {
-            const rect = stencil.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-
-            const now = Math.atan2(e.clientY - cy, e.clientX - cx);
-            const delta = (now - startAngle) * 180 / Math.PI;
-
-            gsap.set(stencil, { rotation: startRotation + delta });
-            positionHandles();
-        },
-    });
-
-    new ResizeObserver(positionHandles).observe(stencil);
-    positionHandles();

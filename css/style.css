@@ -127,7 +127,7 @@
     position: absolute;
     top: 30%;
     left: 35%;
-    width: 30%;
+    width: 220px;        /* fixed, not % */
     height: auto;
     cursor: grab;
     user-select: none;
@@ -135,7 +135,11 @@
     touch-action: none;
     outline: 3px dashed transparent;
     outline-offset: 7px;
+    transform-origin: center center;
+    will-change: transform;
+    transition: none;    /* nothing animating transform behind GSAP's back */
 }
+
 
 #imgStencil.selected {
     outline-color: #4a90d9;
@@ -184,3 +188,4 @@
 .rotate-handle:active {
     cursor: grabbing;
 }
+

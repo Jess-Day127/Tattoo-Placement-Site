@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Try-On</title>
     <link rel="icon" type="image/x-icon" href="./assets/favicon 2.png">
     <link rel="stylesheet" href="./css/style.css">
 
@@ -49,7 +49,11 @@
         <h2>Try On</h2>
         <div class="try-on-area">
             <img id="imgBodyArea" alt="Body area">
-            <img id="imgStencil" alt="Your design">
+                <div class="stencil-box" id="stencilBox">
+                    <img id="imgStencil" alt="Your design">
+                    <div class="resize-handle" id="resizeHandle"></div>
+                    <div class="rotate-handle" id="rotateHandle"></div>
+                </div>
         </div>
     </section>
 
@@ -75,11 +79,12 @@
 
     <script src="./javascript/GSAP Plug-in's/gsap.min.js" defer></script>
 
-    <script src="./javascript/GSAP Plug-in's/Flip.min.js" defer></script>
     <script src="./javascript/GSAP Plug-in's/Draggable.min.js" defer></script>
     <script src="./javascript/GSAP Plug-in's/ScrollTrigger.min.js" defer></script>
+    <script src="./javascript/GSAP Plug-in's/Flip.min.js" defer></script>
 
-    <script src="./javascript/try-on.js" defer></script>
+    <script src="./javascript/animations.js" defer></script>
+    <script src="./javascript/try-on-page.js" defer></script>
     
 </main>
 
