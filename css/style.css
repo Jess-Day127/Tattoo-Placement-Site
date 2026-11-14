@@ -41,75 +41,104 @@
   min-height: 100vh;
 }*/
 
-.bento-grid {
+.flash-wall {
+  width: 90vmin;
+  background: lightcoral;
+  position: relative;
+  overflow: hidden;
+  color-scheme: dark;
+  padding-bottom: 10px; /* so bottom row isn't touching the edge */
+}
+
+.gallery {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  gap: var(--gap);
-  width: 95vw;
-  max-width: 800px;
-  aspect-ratio: 1 / 1;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 10px;
 }
 
 .item {
-  background: var(--dark);
-  background: transparent;
-  border: 1px solid #222;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #444;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
   cursor: pointer;
-  position: relative;
-  border-radius: var(--radius);
-}
-
-.item .item-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  border-radius: var(--radius);
+  font-size: 0;
+  aspect-ratio: 1/1;
   overflow: hidden;
-  position: relative;
+  border-radius: 10px;
+  background-color: #1c1d1f;
+
+  /* <-- CENTRE the image inside the tile */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.item .item-content img {
-  position: absolute;
+.gallery img, .item img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  z-index: 1;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+  padding: 12%;
+  border-radius: 10px;
+  background-color: transparent;
 }
 
-.item .item-content .description {
-  position: relative;
-  z-index: 2;
+
+.detail {
+  position: absolute;
+  top: 0;
+  left: 50%; /* OG needs this, otherwise xPercent: -50 pushes it off-screen */
+  width: 80vmin;
+  height: 80vmin;
+  z-index: 100;
+  cursor: pointer;
+  visibility: hidden;
+  background: #0a0a0a;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail img {
+  display: block;
   width: 100%;
-  min-height: 40px;
-  background-color: var(--description-fade);
-  padding: 4px;
-  text-align: center;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  object-fit: contain;
+  padding: 5%;
 }
 
-.item:not(.selected):hover {
-  transform: scale(1.08);
-  z-index: 3;
-  border-color: var(--light);
-  color: var(--light);
-  box-shadow: 0 3px 10px rgba(255, 255, 255, 0.5);
+.detail .content {
+  position: relative;
+  width: 100%;
+  padding: 16px 20px;
+  background: #0a0a0a;
+  color: white;
+  flex-shrink: 0;
 }
 
-.selected {
-  grid-area: 2 / 2 / 5 / 5;
-  color: var(--light);
-  font-size: 1.5rem;
-  border-color: transparent;
-  z-index: 10;
+.detail .title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
+
+.detail .description {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 .try-on-area {
     position: relative;
