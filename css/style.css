@@ -146,19 +146,18 @@
     cursor: move;
 }
 
+
 .resize-handle {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 16px;
-    height: 16px;
-    background: #4a90d9;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    cursor: nwse-resize;
-    touch-action: none;
-    z-index: 10;
-    display: none;          /* hidden until selected */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border-style: solid;
+  background: #4a90d9;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: nw-resize !important;
 }
 
 .resize-handle.visible {
