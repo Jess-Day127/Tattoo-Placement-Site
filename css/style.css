@@ -181,13 +181,13 @@
 .resize-handle,
 .rotate-handle {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border: 2px solid #fff;
   border-radius: 50%;
   touch-action: none;
   z-index: 10;
-  display: none; /* hidden until selected */
+  display: none;
 }
 
 .resize-handle.visible,
@@ -196,8 +196,8 @@
 }
 
 .resize-handle {
-  right: -8px;
-  bottom: -8px;
+  right: -6px;
+  bottom: -6px;
   background: #4a90d9;
   cursor: nwse-resize !important;
 }
@@ -205,8 +205,8 @@
 /* above the top-center of the BOX */
 .rotate-handle {
   left: 50%;
-  top: -28px;
-  transform: translateX(-50%);
+  top: -22px;
+  margin-left: -6px; /* half of 12px width = perfectly centered, no transform */
   background: #fff;
   border-color: #4a90d9;
   cursor: grab;
@@ -215,7 +215,6 @@
 .rotate-handle:active {
   cursor: grabbing;
 }
-
 
 .upload-section {
     min-height: 100vh;

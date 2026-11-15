@@ -79,9 +79,9 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   const saved = sessionStorage.getItem('stencil');
   if (saved) stencilImg.src = saved;
 
-  gsap.set(box, { xPercent: -50, yPercent: -50, transformOrigin: 'center center' });
+  gsap.set(box, { xPercent: -50, yPercent: -50, transformOrigin: 'center center', scale: 1 });
 
-  let startScale = 1, startDist = 1, centre = { cx: 0, cy: 0 };
+  let startWidth = 220, startDist = 1, centre = { cx: 0, cy: 0 };
   let startAngle = 0, startRotation = 0;
 
   function boxCentre() {
@@ -124,8 +124,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     onPress(e) {
       e.stopPropagation();
       select();
-      startScale = gsap.getProperty(box, 'scale');
-      // FIX 2: use c, not centre / stageRect
+      startWidth = box.offsetWidth;
       const c = boxCentre();
       centre = c;
       startDist = Math.hypot(
@@ -139,8 +138,12 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
         e.clientX - stageRect.left - cx,
         e.clientY - stageRect.top - cy
       );
-      const scale = Math.max(0.1, startScale * (dist / startDist));
-      gsap.set(box, { scale });
+      const newWidth = Math.max(40, startWidth * (dist / startDist));
+      gsap.set(box, { width: newWidth, scale: 1 });
+      gsap.set(resizeHandle, { x: 0, y: 0 });
+    },
+    onRelease() {
+      gsap.set(resizeHandle, { x: 0, y: 0 });
     }
   });
 
@@ -165,13 +168,18 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
       );
       const delta = (now - startAngle) * 180 / Math.PI;
       gsap.set(box, { rotation: startRotation + delta });
+      gsap.set(rotateHandle, { x: 0, y: 0 });
     },
+    onRelease() {
+      gsap.set(rotateHandle, { x: 0, y: 0 });
+    }
   });
 
   select();
 })();
 
-/* ===== Scroll to stencil - ONLY on upload ===== */
+
+/* Scroll to stencil */
 (() => {
   const uploadSection = document.querySelector('.upload-section');
   const afterLayer = document.getElementById('afterLayer');
