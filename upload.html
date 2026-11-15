@@ -25,19 +25,24 @@
         <section class="upload-section">
             <div class="img-upload">
                 <h2>Upload your Design</h2>
-                <div id="drop-area">
-                    <label for="input-file">
-                        <input type="file" id="input-file" accept="image/jpeg, image/png, image/jpg" hidden>
-                        <div id="img-view">
-                            <img src="./assets/upload.png" alt="">
-                            <p>Drag and drop or click here to upload your design</p>
-                        </div>
-                    </label>
+
+                <div class="comparisonSection" id="drop-area">
+                    <div class="comparisonImage beforeImage" id="img-view">
+                        <img id="uploadIcon" src="./assets/upload.png" alt="before">
+                        <p id="uploadHint">Drag and drop or click here to upload your design</p>
+                        <label for="input-file" class="upload-overlay">
+                            <input type="file" id="input-file" accept="image/jpeg, image/png, image/jpg" hidden>
+                        </label>
+                    </div>
+
+                    <div class="comparisonImage afterImage" id="afterLayer">
+                        <img id="afterImg" src="" alt="after">
+                    </div>
                 </div>
 
                 <button type="button" id="removeBgBtn" disabled>Convert to Stencil</button>
+                <h4 class="header-section">Scroll to see the before/after</h4>
                 <a href="./try-on.html" id="tryOnBtn" style="display: none;">Try On</a>
-
             </div>
         </section>
 

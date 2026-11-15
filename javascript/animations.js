@@ -1,5 +1,5 @@
 
-gsap.registerPlugin(Flip, Draggable); 
+gsap.registerPlugin(Flip, Draggable, ScrollTrigger); 
 
 
 /* Flash Wall*/
@@ -242,3 +242,27 @@ gsap.registerPlugin(Draggable);
 })();
 
 
+/* Scroll to stencil */
+gsap.registerPlugin(ScrollTrigger);
+
+// AFTER starts parked off to the right
+gsap.set("#afterLayer", { xPercent: 100 });
+gsap.set("#afterImg", { xPercent: -100 });
+
+const wipe = gsap.timeline({
+  scrollTrigger: {
+    trigger: ".upload-section",
+    start: "top top",     // lock when section hits top
+    end: "+=800",         // 800px of scroll = full wipe. Higher = slower
+    scrub: 1,             // smooths scroll-back-up judder
+    pin: true,            // screen stays fixed while wiping
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    enabled: false        // only pin after Convert
+  },
+  defaults: { ease: "none" }
+});
+
+wipe
+  .to("#afterLayer", { xPercent: 0 }, 0)
+  .to("#afterImg", { xPercent: 0 }, 0); 

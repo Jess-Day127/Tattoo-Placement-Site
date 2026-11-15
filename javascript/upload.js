@@ -1,9 +1,14 @@
 // Design Upload
-const dropArea  = document.getElementById('drop-area');
-const inputFile = document.getElementById('input-file');
-const imageView = document.getElementById('img-view');
-const removeBtn = document.getElementById('removeBgBtn');   // was missing
-const tryOnBtn  = document.getElementById('tryOnBtn');
+const dropArea   = document.getElementById('drop-area');
+const inputFile  = document.getElementById('input-file');
+const imageView  = document.getElementById('img-view');
+const removeBtn  = document.getElementById('removeBgBtn');
+const tryOnBtn   = document.getElementById('tryOnBtn');
+
+const afterImg   = document.getElementById('afterImg');
+const afterLayer = document.getElementById('afterLayer');
+const uploadIcon = document.getElementById('uploadIcon');
+const uploadHint = document.getElementById('uploadHint');
 
 if (dropArea && inputFile && imageView) {
     let currentFile = null;
@@ -15,17 +20,25 @@ if (dropArea && inputFile && imageView) {
         currentFile = file;
 
         const imgLink = URL.createObjectURL(file);
+
+        // BEFORE - never overwritten
         imageView.style.backgroundImage = `url(${imgLink})`;
         imageView.style.backgroundSize = 'contain';
         imageView.style.backgroundRepeat = 'no-repeat';
         imageView.style.backgroundPosition = 'center';
-        imageView.textContent = '';
         imageView.style.border = '0';
 
-        if (removeBtn) removeBtn.disabled = false;
+        if (uploadIcon) uploadIcon.style.display = 'none';
+        if (uploadHint) uploadHint.style.display = 'none';
+
+        // reset to BEFORE state: hide AFTER, show Convert, hide Scroll + Try On
+        if (afterLayer) afterLayer.style.visibility = 'hidden';
+        if (removeBtn) { removeBtn.style.display = 'inline-block'; removeBtn.disabled = false; }
+        if (tryOnBtn) tryOnBtn.style.display = 'none';
+        wipe.scrollTrigger.disable();
     }
 
-    // block the browser from opening the file
+    // block browser from opening file
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
         dropArea.addEventListener(evt, e => {
             e.preventDefault();
@@ -34,18 +47,15 @@ if (dropArea && inputFile && imageView) {
     });
 
     dropArea.addEventListener('dragover', e => {
-        e.dataTransfer.dropEffect = 'copy';   // shows the "copy" cursor
+        e.dataTransfer.dropEffect = 'copy';
     });
 
     dropArea.addEventListener('drop', e => {
         const file = e.dataTransfer.files[0];
         if (!file) return;
-
-        // keep the input in sync so inputFile.files[0] works later
         const dt = new DataTransfer();
         dt.items.add(file);
         inputFile.files = dt.files;
-
         uploadImage(file);
     });
 
@@ -59,22 +69,26 @@ if (dropArea && inputFile && imageView) {
             const noBgBlob = await removeBackground(currentFile);
             const url = URL.createObjectURL(noBgBlob);
 
-            imageView.style.backgroundImage = `url(${url})`;
-            imageView.style.backgroundSize = 'contain';
-            imageView.style.backgroundRepeat = 'no-repeat';
-            imageView.style.backgroundPosition = 'center';
+            // BEFORE stays in imageView - DO NOT touch it
+            // AFTER only:
+            if (afterImg) afterImg.src = url;
+            if (afterLayer) afterLayer.style.visibility = 'visible';
 
-            // hand the stencil to the try-on page
+            // BUTTON SWAP: hide Convert, show Scroll + Try On
+            if (removeBtn) removeBtn.style.display = 'none';
+            if (tryOnBtn) tryOnBtn.style.display = 'inline-block';
+
+            wipe.scrollTrigger.enable();
+            if (window.ScrollTrigger) ScrollTrigger.refresh();
+
             const reader = new FileReader();
             reader.onload = () => sessionStorage.setItem('stencil', reader.result);
             reader.readAsDataURL(noBgBlob);
 
-            if (tryOnBtn) tryOnBtn.style.display = 'inline-block';
         } catch (err) {
             console.error(err);
             alert('Failed to remove background');
-        } finally {
-            removeBtn.disabled = false;
+            if (removeBtn) { removeBtn.style.display = 'inline-block'; removeBtn.disabled = false; removeBtn.textContent = 'Convert to Stencil'; }
         }
     });
 }

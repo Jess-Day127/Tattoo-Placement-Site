@@ -217,3 +217,119 @@
     cursor: grabbing;
 }
 
+
+.upload-section {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+  }
+
+  .img-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    width: min(90vw, 600px);
+  }
+
+  /* ===== DROP BOX = COMPARISON BOX ===== */
+  #drop-area {
+    position: relative;
+    width: min(90vw, 560px);
+    aspect-ratio: 1 / 1;
+    overflow: hidden; /* clips the wipe to INSIDE the box */
+    background: #eef1f4;
+    border-radius: 12px;
+    border: 2px dashed #ccc;
+  }
+
+  .comparisonImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* BEFORE layer */
+  #img-view {
+    z-index: 1;
+    background-color: #eef1f4;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  /* AFTER layer - checkerboard for transparent bg */
+  #afterLayer {
+    z-index: 2;
+    visibility: hidden; /* shown only after Convert */
+    background-color: #fff;
+    background-image:
+      linear-gradient(45deg, #ddd 25%, transparent 25%),
+      linear-gradient(-45deg, #ddd 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #ddd 75%),
+      linear-gradient(-45deg, transparent 75%, #ddd 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  }
+
+  #afterImg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .upload-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    cursor: pointer;
+  }
+
+  #uploadIcon {
+    width: 80px;
+    opacity: .6;
+    pointer-events: none;
+  }
+
+  #uploadHint {
+    pointer-events: none;
+    color: #555;
+    margin-top: 10px;
+  }
+
+  button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #222;
+    background: #fff;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+
+  #tryOnBtn {
+    text-decoration: none;
+    color: #222;
+    font-weight: bold;
+    border: 1px solid #222;
+    padding: 10px 20px;
+    border-radius: 8px;
+  }
+
+  /* ===== SECTION BELOW - what you scroll TO after wipe ===== */
+  .next-section {
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: #ffb3b3;
+    text-align: center;
+  }
