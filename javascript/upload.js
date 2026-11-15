@@ -35,7 +35,7 @@ if (dropArea && inputFile && imageView) {
         if (afterLayer) afterLayer.style.visibility = 'hidden';
         if (removeBtn) { removeBtn.style.display = 'inline-block'; removeBtn.disabled = false; }
         if (tryOnBtn) tryOnBtn.style.display = 'none';
-        wipe.scrollTrigger.disable();
+        window.wipe.scrollTrigger.disable();
     }
 
     // block browser from opening file
@@ -78,7 +78,7 @@ if (dropArea && inputFile && imageView) {
             if (removeBtn) removeBtn.style.display = 'none';
             if (tryOnBtn) tryOnBtn.style.display = 'inline-block';
 
-            wipe.scrollTrigger.enable();
+            window.wipe.scrollTrigger.enable();
             if (window.ScrollTrigger) ScrollTrigger.refresh();
 
             const reader = new FileReader();
