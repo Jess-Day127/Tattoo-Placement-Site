@@ -1,58 +1,110 @@
 // Change Body Area Skin Tone
-const bodyAreaImages = {
-        torso: {
-            light: './assets/torso light.jpg',
-            medium: './assets/torso medium.jpg',
-            dark: './assets/torso dark.jpg'
+const bodyImages = {
+    torso: {
+        1: {
+            greyscale: './assets/Body Areas/Torso/front 1 (def).png',
+            light: './assets/Body Areas/Torso/front 1 (light).png',
+            medium: './assets/Body Areas/Torso/front 1 (med).png',
+            dark: './assets/Body Areas/Torso/front 1 (dark).png'
         },
-        back: {
-            light: './assets/back light.jpg',
-            medium: './assets/back medium.jpg',
-            dark: './assets/back dark.jpg'
+        2: {
+            greyscale: './assets/Body Areas/Torso/front 2 (def).png',
+            light: './assets/Body Areas/Torso/front 2 (light).png',
+            medium: './assets/Body Areas/Torso/front 2 (med).png',
+            dark: './assets/Body Areas/Torso/front 2 (dark).png'
         },
-        knuckles: {
-            greyscale: './assets/knuckles 0.jpg',
-            light: './assets/knuckles 1.jpg',
-            medium: './assets/knuckles 2.jpg',
-            dark: './assets/knuckles 3.jpg'
-        },
-        arm: {
-            light: './assets/arm light.jpg',
-            medium: './assets/arm medium.jpg',
-            dark: './assets/arm dark.jpg'
-        },
-    };
+        3: {
+            greyscale: './assets/Body Areas/Torso/front 3 (def).png',
+            light: './assets/Body Areas/Torso/front 3 (light).png',
+            medium: './assets/Body Areas/Torso/front 3 (med).png',
+            dark: './assets/Body Areas/Torso/front 3 (dark).png'
+        }
+    },
 
-    let currentSkinTone = 'greyscale'; // default
-    let stencilImage = sessionStorage.getItem('stencil');
-    const stencil = document.getElementById('imgStencil');
+    back: {
+        1: {
+            greyscale: './assets/Body Areas/Torso/back 1 (def).png',
+            light: './assets/Body Areas/Torso/back 1 (light).png',
+            medium: './assets/Body Areas/Torso/back 1 (med).png',
+            dark: './assets/Body Areas/Torso/back 1 (dark).png'
+        },
+        2: {
+            greyscale: './assets/Body Areas/Torso/back 2 (def).png',
+            light: './assets/Body Areas/Torso/back 2 (light).png',
+            medium: './assets/Body Areas/Torso/back 2 (med).png',
+            dark: './assets/Body Areas/Torso/back 2 (dark).png'
+        },
+        3: {
+            greyscale: './assets/Body Areas/Torso/back 3 (def).png',
+            light: './assets/Body Areas/Torso/back 3 (light).png',
+            medium: './assets/Body Areas/Torso/back 3 (med).png',
+            dark: './assets/Body Areas/Torso/back 3 (dark).png'
+        }
+    },
 
-    function changeSkinTone(tone) {
+    knuckles: {
+        1: {
+        greyscale: './assets/Body Areas/Knuckle/default.png',
+            light: './assets/Body Areas/Knuckle/light.png',
+            medium: './assets/Body Areas/Knuckle/medium.png',
+            dark: './assets/Body Areas/Knuckle/dark.png'
+        }
+    }
+};
+
+let currentArea = 'torso'; // default
+let currentBodyType = '1';
+let currentSkinTone = 'greyscale'; // default
+
+const stencilImage = sessionStorage.getItem('stencil');
+const stencilBox = document.getElementById('stencilBox');
+const stencilImg = document.getElementById('imgStencil');
+
+function changeSkinTone(tone) {
     currentSkinTone = tone;
     updateImage();
 }
 
-function updateImage() {
-    const select = document.getElementById('body-area-select');
-    const img = document.getElementById('imgBodyArea');
-    if (!select || !img) return;
-
-    const area = bodyAreaImages[select.value];
-    if (!area) return;
-
-    img.src = area[currentSkinTone] ?? area.light;
+function changeBodyType(type) {
+    currentBodyType = type;
+    updateImage();
+    resetStencilPosition(); // body shape changed, so center the stencil again
 }
 
-const stencilBox = document.getElementById('stencilBox');
-const stencilImg = document.getElementById('imgStencil');
+function changeBodyArea(area) {
+    currentArea = area;
+    updateImage();
+    resetStencilPosition(); // body shape changed, so center the stencil again
+}
+
+function updateImage() {
+  const img = document.getElementById('imgBodyArea');
+  if (!img) return;
+
+  const areaData = bodyImages[currentArea];
+  if (!areaData) return;
+
+  // fallback: if this body type doesn't exist for this area, use type 1
+  const typeData = areaData[currentBodyType] || areaData['1'];
+  if (!typeData) return;
+
+  // fallback: if this tone doesn't exist for this type, use light, then greyscale
+  img.src = typeData[currentSkinTone] ?? typeData.light ?? typeData.greyscale;
+}
+
+function resetStencilPosition() {
+  if (!stencilBox) return;
+  // back to center, no rotation, default size - so it doesn't end up floating off a curvier body
+  gsap.set(stencilBox, { x: 0, y: 0, xPercent: -50, yPercent: -50, rotation: 0, width: 220 });
+}
 
 function showStencil() {
-    if (!stencilBox || !stencilImg || !stencilImage) return;
-
-    stencilImg.src = stencilImage;
-    stencilBox.style.display = 'block';
+  if (!stencilBox || !stencilImg || !stencilImage) return;
+  stencilImg.src = stencilImage;
+  stencilBox.style.display = 'block';
 }
-if (document.getElementById('body-area-select')) {
-    updateImage();
-    showStencil();
+
+if (document.getElementById('imgBodyArea')) {
+  updateImage();
+  showStencil();
 }

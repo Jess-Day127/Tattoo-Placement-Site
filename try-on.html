@@ -61,7 +61,7 @@
         <div class="body-area-dropdown">
             <h2>Select Body Area</h2>
             <img src="" alt="Select Body Area" id="imgBodyAreaPreview">
-            <select id="body-area-select" onchange="updateImage()">
+            <select id="body-area-select" onchange="changeBodyArea(this.value)">
                 <option value="torso">Torso</option>
                 <option value="back">Back</option>
                 <option value="knuckles">Knuckles</option>
@@ -70,11 +70,20 @@
 
         <div class="skin-tone">
             <h2>Skin Tone</h2>
+            <button onclick="changeSkinTone('greyscale')">Default</button>
             <button onclick="changeSkinTone('light')">Light</button>
             <button onclick="changeSkinTone('medium')">Medium</button>
             <button onclick="changeSkinTone('dark')">Dark</button>
         </div>
+
+        <div class="body-type">
+            <h2>Body Type</h2>
+            <button onclick="changeBodyType('1')">1</button>
+            <button onclick="changeBodyType('2')">2</button>
+            <button onclick="changeBodyType('3')">3</button>
+        </div>
     </section>
+
 
 
     <script src="./javascript/GSAP Plug-in's/gsap.min.js" defer></script>
