@@ -42,6 +42,102 @@ const bodyImages = {
         }
     },
 
+    ribs: {
+        1: {
+            greyscale: './assets/Body Areas/Torso/side 1 (def).png',
+            light: './assets/Body Areas/Torso/side 1 (light).png',
+            medium: './assets/Body Areas/Torso/side 1 (med).png',
+            dark: './assets/Body Areas/Torso/side 1 (dark).png'
+        },
+
+        2: {
+            greyscale: './assets/Body Areas/Torso/side 2 (def).png',
+            light: './assets/Body Areas/Torso/side 2 (light).png',
+            medium: './assets/Body Areas/Torso/side 2 (med).png',
+            dark: './assets/Body Areas/Torso/side 2 (dark).png'
+        },
+
+        3: {
+            greyscale: './assets/Body Areas/Torso/side 3 (def).png',
+            light: './assets/Body Areas/Torso/side 3 (light).png',
+            medium: './assets/Body Areas/Torso/side 3 (med).png',
+            dark: './assets/Body Areas/Torso/side 3 (dark).png'
+        }
+    },
+
+    head: {
+        1: {
+            greyscale: './assets/Body Areas/Head/back (def).png',
+            light: './assets/Body Areas/Head/back (light).png',
+            medium: './assets/Body Areas/Head/back (med).png',
+            dark: './assets/Body Areas/Head/back (dark).png'
+        }
+    },
+
+    ear: {
+        1: {
+            greyscale: './assets/Body Areas/Head/side (def).png',
+            light: './assets/Body Areas/Head/side (light).png',
+            medium: './assets/Body Areas/Head/side (med).png',
+            dark: './assets/Body Areas/Head/side (dark).png'
+        }
+    },
+
+    throat: {
+        1: {
+            greyscale: './assets/Body Areas/Head/front (def).png',
+            light: './assets/Body Areas/Head/front (light).png',
+            medium: './assets/Body Areas/Head/front (med).png',
+            dark: './assets/Body Areas/Head/front (dark).png'
+        }
+    },
+
+    armInside: {
+        1: {
+            greyscale: './assets/Body Areas/Arm/in 1 (def).png',
+            light: './assets/Body Areas/Arm/in 1 (light).png',
+            medium: './assets/Body Areas/Arm/in 1 (med).png',
+            dark: './assets/Body Areas/Arm/in 1 (dark).png'
+        },
+
+        2: {
+            greyscale: './assets/Body Areas/Arm/in 2 (def).png',
+            light: './assets/Body Areas/Arm/in 2 (light).png',
+            medium: './assets/Body Areas/Arm/in 2 (med).png',
+            dark: './assets/Body Areas/Arm/in 2 (dark).png'
+        },
+
+        3: {
+            greyscale: './assets/Body Areas/Arm/in 3 (def).png',
+            light: './assets/Body Areas/Arm/in 3 (light).png',
+            medium: './assets/Body Areas/Arm/in 3 (med).png',
+            dark: './assets/Body Areas/Arm/in 3 (dark).png'
+        }
+    },
+
+        armOutside: {
+        1: {
+            greyscale: './assets/Body Areas/Arm/out 1 (def).png',
+            light: './assets/Body Areas/Arm/out 1 (light).png',
+            medium: './assets/Body Areas/Arm/out 1 (med).png',
+            dark: './assets/Body Areas/Arm/out 1 (dark).png'
+        },
+
+        2: {
+            greyscale: './assets/Body Areas/Arm/out 2 (def).png',
+            light: './assets/Body Areas/Arm/out 2 (light).png',
+            medium: './assets/Body Areas/Arm/out 2 (med).png',
+            dark: './assets/Body Areas/Arm/out 2 (dark).png'
+        },
+
+        3: {
+            greyscale: './assets/Body Areas/Arm/out 3 (def).png',
+            light: './assets/Body Areas/Arm/out 3 (light).png',
+            medium: './assets/Body Areas/Arm/out 3 (med).png',
+            dark: './assets/Body Areas/Arm/out 3 (dark).png'
+        }
+    },
+
     knuckles: {
         1: {
         greyscale: './assets/Body Areas/Knuckle/default.png',
@@ -90,6 +186,11 @@ function updateImage() {
 
   // fallback: if this tone doesn't exist for this type, use light, then greyscale
   img.src = typeData[currentSkinTone] ?? typeData.light ?? typeData.greyscale;
+
+  const clip = document.getElementById('stencilClip');
+  if (clip) {
+    clip.style.setProperty('--body-mask', `url("${newSrc}")`);
+  }
 }
 
 function resetStencilPosition() {

@@ -128,12 +128,6 @@
   margin-top: 4px;
 }
 
-
-
-
-
-
-
 .try-on-area {
   position: relative;
   display: inline-block;
@@ -146,6 +140,7 @@
   display: block;
   max-width: 100%;
 }
+
 
 /* ===== THE BOX is what moves / scales / rotates ===== */
 .stencil-box {
@@ -163,6 +158,24 @@
 .stencil-box.selected {
   outline-color: #4a90d9;
   cursor: move;
+}
+
+#stencilClip {
+  position: absolute;
+  inset: 0; /* exactly the same size as #imgBodyArea */
+  -webkit-mask-image: var(--body-mask);
+  mask-image: var(--body-mask);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  pointer-events: none;
+}
+
+#stencilClip .stencil-box {
+  pointer-events: auto;
 }
 
 #imgStencil {

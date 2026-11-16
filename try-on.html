@@ -49,11 +49,14 @@
         <h2>Try On</h2>
         <div class="try-on-area">
             <img id="imgBodyArea" alt="Body area">
+
+            <div id="stencilClip">
                 <div class="stencil-box" id="stencilBox">
                     <img id="imgStencil" alt="Your design">
                     <div class="resize-handle" id="resizeHandle"></div>
                     <div class="rotate-handle" id="rotateHandle"></div>
                 </div>
+            </div>
         </div>
     </section>
 
@@ -62,9 +65,17 @@
             <h2>Select Body Area</h2>
             <img src="" alt="Select Body Area" id="imgBodyAreaPreview">
             <select id="body-area-select" onchange="changeBodyArea(this.value)">
+                <option value="head">Head</option>
+                <option value="throat">Throat</option>
+                <option value="ear">Ear</option>
                 <option value="torso">Torso</option>
+                <option value="ribs">Ribs</option>
                 <option value="back">Back</option>
+                <option value="armInside">Arm Inside</option>
+                <option value="armOutside">Arm Outside</option>
                 <option value="knuckles">Knuckles</option>
+                
+                
             </select>
         </div>
 
