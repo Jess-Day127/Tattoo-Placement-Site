@@ -151,7 +151,7 @@
   aspect-ratio: 1 / 1;
   touch-action: none;
   cursor: grab;
-  outline: 3px dashed transparent;
+  outline: 4px dashed transparent;
   outline-offset: 7px;
 }
 
@@ -194,8 +194,8 @@
 .resize-handle,
 .rotate-handle {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   border: 2px solid #fff;
   border-radius: 50%;
   touch-action: none;

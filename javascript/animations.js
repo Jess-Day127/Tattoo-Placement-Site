@@ -112,7 +112,6 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
 
   Draggable.create(box, {
     type: 'x,y',
-    bounds: stage,
     onPress() { select(); }
   });
 

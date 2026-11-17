@@ -214,6 +214,29 @@ const bodyImages = {
             medium: './assets/Body Areas/Leg/back 3 (med).png',
             dark: './assets/Body Areas/Leg/back 3 (dark).png'
         }
+    },
+
+    hip: {
+        1: {
+            greyscale: './assets/Body Areas/Hip/1 (def).png',
+            light: './assets/Body Areas/Hip/1 (light).png',
+            medium: './assets/Body Areas/Hip/1 (med).png',
+            dark: './assets/Body Areas/Hip/1 (dark).png'
+        },
+
+        2: {
+            greyscale: './assets/Body Areas/Hip/2 (def).png',
+            light: './assets/Body Areas/Hip/2 (light).png',
+            medium: './assets/Body Areas/Hip/2 (med).png',
+            dark: './assets/Body Areas/Hip/2 (dark).png'
+        },
+
+        3: {
+            greyscale: './assets/Body Areas/Hip/3 (def).png',
+            light: './assets/Body Areas/Hip/3 (light).png',
+            medium: './assets/Body Areas/Hip/3 (med).png',
+            dark: './assets/Body Areas/Hip/3 (dark).png'
+        },
     }
 };
 
@@ -233,13 +256,12 @@ function changeSkinTone(tone) {
 function changeBodyType(type) {
     currentBodyType = type;
     updateImage();
-    resetStencilPosition(); // body shape changed, so center the stencil again
+    
 }
 
 function changeBodyArea(area) {
     currentArea = area;
     updateImage();
-    resetStencilPosition(); // body shape changed, so center the stencil again
 }
 
 function updateImage() {
@@ -267,8 +289,16 @@ function updateImage() {
 
 function resetStencilPosition() {
   if (!stencilBox) return;
-  // back to center, no rotation, default size - so it doesn't end up floating off a curvier body
-  gsap.set(stencilBox, { x: 0, y: 0, xPercent: -50, yPercent: -50, rotation: 0, width: 220 });
+  // back to center, no rotation, default size
+  gsap.set(stencilBox, {
+    x: 0,
+    y: 0,
+    xPercent: -50,
+    yPercent: -50,
+    rotation: 0,
+    scale: 1,
+    width: 220
+  });
 }
 
 function showStencil() {
@@ -280,4 +310,11 @@ function showStencil() {
 if (document.getElementById('imgBodyArea')) {
   updateImage();
   showStencil();
+}
+
+const resetStencilBtn = document.getElementById('resetStencilBtn');
+if (resetStencilBtn) {
+  resetStencilBtn.addEventListener('click', () => {
+    resetStencilPosition();
+  });
 }
