@@ -253,12 +253,15 @@ function updateImage() {
   const typeData = areaData[currentBodyType] || areaData['1'];
   if (!typeData) return;
 
-  // fallback: if this tone doesn't exist for this type, use light, then greyscale
-  img.src = typeData[currentSkinTone] ?? typeData.light ?? typeData.greyscale;
+  const newSrc = typeData[currentSkinTone] ?? typeData.light ?? typeData.greyscale;
+  img.src = newSrc;
 
   const clip = document.getElementById('stencilClip');
   if (clip) {
-    clip.style.setProperty('--body-mask', `url("${newSrc}")`);
+    const maskUrl = `url("${newSrc}")`;
+    clip.style.setProperty('--body-mask', maskUrl);
+    clip.style.webkitMaskImage = maskUrl;
+    clip.style.maskImage = maskUrl;
   }
 }
 

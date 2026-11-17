@@ -92,3 +92,37 @@ if (dropArea && inputFile && imageView) {
         }
     });
 }
+
+// ===== FLASH WALL - Use this design =====
+const useDesignBtn = document.getElementById('useDesignBtn');
+const detailImg = document.querySelector('.detail img');
+
+if (useDesignBtn && detailImg) {
+  useDesignBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+
+    const src = detailImg.src;
+    if (!src) return;
+
+    useDesignBtn.textContent = 'Loading...';
+    useDesignBtn.disabled = true;
+
+    try {
+      const res = await fetch(src);
+      const blob = await res.blob();
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        sessionStorage.setItem('stencil', reader.result);
+        window.location.href = './try-on.html';
+      };
+      reader.readAsDataURL(blob);
+
+    } catch (err) {
+      console.error(err);
+      alert('Could not load that design');
+      useDesignBtn.textContent = 'Use this design';
+      useDesignBtn.disabled = false;
+    }
+  });
+}

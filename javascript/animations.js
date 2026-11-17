@@ -9,7 +9,6 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   const detailContent = document.querySelector('.detail .content');
   const detailImage = document.querySelector('.detail img');
   const detailTitle = document.querySelector('.detail .title');
-  const detailDescription = document.querySelector('.detail .description');
 
   let activeItem;
 
@@ -34,7 +33,6 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     detailImage.addEventListener("load", onLoad);
     detailImage.src = item.querySelector('img').src;
     detailTitle.innerText = data.title;
-    detailDescription.innerText = data.description;
     gsap.to(items, { opacity: 0.3, stagger: { amount: 0.7, from: items.indexOf(item), grid: "auto" } });
     activeItem = item;
   }

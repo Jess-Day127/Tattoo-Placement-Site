@@ -63,7 +63,7 @@
   aspect-ratio: 1/1;
   overflow: hidden;
   border-radius: 10px;
-  background-color: #1c1d1f;
+  background-color: transparent;
 
   /* <-- CENTRE the image inside the tile */
   display: flex;
@@ -91,7 +91,7 @@
   z-index: 100;
   cursor: pointer;
   visibility: hidden;
-  background: #0a0a0a;
+  background: transparent;
   overflow: hidden;
   display: flex;
   flex-direction: column;
