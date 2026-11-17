@@ -92,7 +92,6 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     };
   }
 
-  // FIX 1: removed positionHandles() - it doesn't exist
   function select() {
     box.classList.add('selected');
     resizeHandle.classList.add('visible');
@@ -110,10 +109,93 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     if (!box.contains(e.target)) deselect();
   });
 
-  Draggable.create(box, {
-    type: 'x,y',
-    onPress() { select(); }
+    // ===== Sliders + Undo/Redo =====
+  const posX = document.getElementById('posX');
+  const posY = document.getElementById('posY');
+  const rotSlider = document.getElementById('rotSlider');
+  const scaleSlider = document.getElementById('scaleSlider');
+  const undoBtn = document.getElementById('undo-button');
+  const redoBtn = document.getElementById('redo-button');
+  const resetBtn = document.getElementById('resetStencilBtn');
+
+  let undoStack = [];
+  let redoStack = [];
+  let isApplying = false;
+
+  function getState() {
+    return {
+      x: gsap.getProperty(box, 'x'),
+      y: gsap.getProperty(box, 'y'),
+      rotation: gsap.getProperty(box, 'rotation'),
+      width: box.offsetWidth,
+    };
+  }
+
+  function applyState(s) {
+    isApplying = true;
+    gsap.set(box, { x: s.x, y: s.y, rotation: s.rotation, width: s.width, scale: 1 });
+    syncSliders();
+    isApplying = false;
+  }
+
+  function saveState() {
+    if (isApplying) return;
+    undoStack.push(getState());
+    if (undoStack.length > 50) undoStack.shift();
+    redoStack = [];
+    updateUndoButtons();
+  }
+
+  function updateUndoButtons() {
+    if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+  }
+
+  function syncSliders() {
+    const s = getState();
+    if (posX) posX.value = s.x;
+    if (posY) posY.value = s.y;
+    if (rotSlider) rotSlider.value = s.rotation;
+    if (scaleSlider) scaleSlider.value = s.width;
+  }
+
+  function bindSlider(el, fn) {
+    if (!el) return;
+    el.addEventListener('input', () => { fn(parseFloat(el.value)); syncSliders(); });
+    el.addEventListener('change', () => saveState());
+  }
+
+  bindSlider(posX, v => gsap.set(box, { x: v }));
+  bindSlider(posY, v => gsap.set(box, { y: v }));
+  bindSlider(rotSlider, v => gsap.set(box, { rotation: v }));
+  bindSlider(scaleSlider, v => gsap.set(box, { width: v, scale: 1 }));
+
+  if (undoBtn) undoBtn.addEventListener('click', () => {
+    if (!undoStack.length) return;
+    redoStack.push(getState());
+    applyState(undoStack.pop());
+    updateUndoButtons();
   });
+
+  if (redoBtn) redoBtn.addEventListener('click', () => {
+    if (!redoStack.length) return;
+    undoStack.push(getState());
+    applyState(redoStack.pop());
+    updateUndoButtons();
+  });
+
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    saveState();
+    gsap.set(box, { x: 0, y: 0, xPercent: -50, yPercent: -50, rotation: 0, scale: 1, width: 220 });
+    syncSliders();
+  });
+
+  Draggable.create(box, {
+  type: 'x,y',
+  onPress() { select(); },
+  onDrag() { syncSliders(); },
+  onRelease() { saveState(); syncSliders(); }
+});
 
   Draggable.create(resizeHandle, {
     type: 'x,y',
@@ -138,9 +220,12 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
       const newWidth = Math.max(40, startWidth * (dist / startDist));
       gsap.set(box, { width: newWidth, scale: 1 });
       gsap.set(resizeHandle, { x: 0, y: 0 });
+      syncSliders();
     },
     onRelease() {
       gsap.set(resizeHandle, { x: 0, y: 0 });
+      saveState();
+      syncSliders();
     }
   });
 
@@ -166,12 +251,17 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
       const delta = (now - startAngle) * 180 / Math.PI;
       gsap.set(box, { rotation: startRotation + delta });
       gsap.set(rotateHandle, { x: 0, y: 0 });
+      syncSliders();
     },
     onRelease() {
       gsap.set(rotateHandle, { x: 0, y: 0 });
+      saveState();
+      syncSliders();
     }
   });
-
+  saveState();
+  syncSliders();
+  updateUndoButtons();
   select();
 })();
 

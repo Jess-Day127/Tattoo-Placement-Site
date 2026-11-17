@@ -262,6 +262,7 @@ function changeBodyType(type) {
 function changeBodyArea(area) {
     currentArea = area;
     updateImage();
+    resetStencilPosition();
 }
 
 function updateImage() {
