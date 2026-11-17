@@ -18,7 +18,7 @@
         </ul>
     </nav>
 
-<main>
+<main id="content">
 
     <section class="left-column">
         <div class="transform-tools">
@@ -95,9 +95,20 @@
             <button onclick="changeBodyType('2')">2</button>
             <button onclick="changeBodyType('3')">3</button>
         </div>
+
+        <div class="pain-overlay">
+
+        </div>
+
+        <div class="export-tools">
+            <h2>Export / Share</h2>
+            <button id="downloadBtn">Download PNG</button>
+            <button id="copyLinkBtn">Copy Share Link</button>
+            <button id="shareBtn">Share</button>
+            <p id="shareStatus"></p>
+        </div>
+
     </section>
-
-
 
     <script src="./javascript/GSAP Plug-in's/gsap.min.js" defer></script>
 
@@ -109,11 +120,6 @@
     <script src="./javascript/try-on-page.js" defer></script>
     
 </main>
-
-<footer>
-    <p>This is a virtual preview. Results may vary.</p>
-    <p>&copy; 2026 X Mark's the Spot All rights reserved.</p>
-</footer>
 
 </body>
 </html>

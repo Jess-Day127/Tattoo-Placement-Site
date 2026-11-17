@@ -319,3 +319,158 @@ if (resetStencilBtn) {
     resetStencilPosition();
   });
 }
+
+// Export & Share
+const downloadBtn = document.getElementById('downloadBtn');
+const copyLinkBtn = document.getElementById('copyLinkBtn');
+const shareBtn = document.getElementById('shareBtn');
+const shareStatus = document.getElementById('shareStatus');
+
+// Find the body + stencil images - tries both IDs so it can't be null
+function getBodyImg() {
+  return document.getElementById('imgBodyArea')
+      || document.getElementById('imgBody')
+      || document.querySelector('.try-on-area img');
+}
+function getStencilImg() {
+  return document.getElementById('imgStencil');
+}
+
+function getDesignState() {
+  // Don't use variable names - read from DOM / sessionStorage
+  // This way it can't throw "is not defined"
+  const bodyImg = getBodyImg();
+  const skinBtn = document.querySelector('[data-skin].active, [data-skin-tone].active');
+  const bodyBtn = document.querySelector('[data-body-type].active, [data-body].active');
+  const areaBtn = document.querySelector('[data-body-area].active, [data-area].active');
+
+  return {
+    // Use the image src / data attribute if you have it, otherwise fallback
+    skin: skinBtn ? (skinBtn.dataset.skin || skinBtn.dataset.skinTone) : (window.currentSkinTone || sessionStorage.getItem('skinTone') || 'light'),
+    body: bodyBtn ? (bodyBtn.dataset.bodyType || bodyBtn.dataset.body) : (window.currentBodyType || sessionStorage.getItem('bodyType') || 'slim'),
+    area: areaBtn ? (areaBtn.dataset.bodyArea || areaBtn.dataset.area) : (window.currentBodyArea || sessionStorage.getItem('bodyArea') || 'forearm'),
+    bodySrc: bodyImg ? bodyImg.src : '',
+    stencil: sessionStorage.getItem('stencilName') || 'custom',
+    x: typeof gsap !== 'undefined' && stencilBox ? gsap.getProperty(stencilBox, 'x') : 0,
+    y: typeof gsap !== 'undefined' && stencilBox ? gsap.getProperty(stencilBox, 'y') : 0,
+    rotation: typeof gsap !== 'undefined' && stencilBox ? gsap.getProperty(stencilBox, 'rotation') : 0,
+    width: stencilBox ? stencilBox.offsetWidth : 220,
+  };
+}
+
+function getShareLink() {
+  const state = getDesignState();
+  const encoded = btoa(JSON.stringify(state));
+  return `${location.origin}${location.pathname}#design=${encoded}`;
+}
+
+function loadFromLink() {
+  const hash = location.hash;
+  if (!hash.startsWith('#design=')) return;
+  try {
+    const state = JSON.parse(atob(hash.replace('#design=', '')));
+    // Don't call updateImage() with undefined vars - just set the stencil transform
+    // Your existing changeBodyType / changeBodyArea functions will handle body
+    if (stencilBox) {
+      gsap.set(stencilBox, {
+        x: state.x || 0, y: state.y || 0,
+        rotation: state.rotation || 0,
+        width: state.width || 220, scale: 1
+      });
+    }
+  } catch(e) { console.log('Bad share link', e); }
+}
+
+loadFromLink();
+
+async function downloadPNG() {
+  const bodyImg = getBodyImg();
+  const stencil = getStencilImg();
+  if (!bodyImg || !stencil) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = bodyImg.naturalWidth;
+  canvas.height = bodyImg.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(bodyImg, 0, 0);
+
+  // 1. Draw stencil on its own canvas
+  const stencilCanvas = document.createElement('canvas');
+  stencilCanvas.width = canvas.width;
+  stencilCanvas.height = canvas.height;
+  const sCtx = stencilCanvas.getContext('2d');
+
+  const bodyRect = bodyImg.getBoundingClientRect();
+  const stencilRect = stencil.getBoundingClientRect();
+  const scaleX = canvas.width / bodyRect.width;
+  const scaleY = canvas.height / bodyRect.height;
+
+  const cx = (stencilRect.left - bodyRect.left + stencilRect.width / 2) * scaleX;
+  const cy = (stencilRect.top - bodyRect.top + stencilRect.height / 2) * scaleY;
+  const w = stencilRect.width * scaleX;
+  const h = stencilRect.height * scaleY;
+  const rot = stencilBox ? gsap.getProperty(stencilBox, 'rotation') * Math.PI / 180 : 0;
+
+  sCtx.save();
+  sCtx.translate(cx, cy);
+  sCtx.rotate(rot);
+  sCtx.drawImage(stencil, -w/2, -h/2, w, h);
+  sCtx.restore();
+
+  // 2. Build a mask from the body image
+  // Corner pixel = background colour (the gap / outside the body)
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = canvas.width;
+  maskCanvas.height = canvas.height;
+  const mCtx = maskCanvas.getContext('2d');
+  mCtx.drawImage(bodyImg, 0, 0);
+  const imgData = mCtx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imgData.data;
+  // sample top-left corner as background
+  const br = d[0], bg = d[1], bb = d[2];
+
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i+1], b = d[i+2];
+    // how close is this pixel to background colour?
+    const dist = Math.abs(r - br) + Math.abs(g - bg) + Math.abs(b - bb);
+    // if it's background -> transparent, else -> keep it
+    d[i+3] = dist < 60 ? 0 : 255;
+  }
+  mCtx.putImageData(imgData, 0, 0);
+
+  // 3. Apply mask to stencil - erases the gap bit
+  sCtx.globalCompositeOperation = 'destination-in';
+  sCtx.drawImage(maskCanvas, 0, 0);
+  sCtx.globalCompositeOperation = 'source-over';
+
+  // 4. Put masked stencil on body
+  ctx.drawImage(stencilCanvas, 0, 0);
+
+  const a = document.createElement('a');
+  a.download = 'my-tattoo-design.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  if (shareStatus) shareStatus.textContent = 'Downloaded!';
+}
+
+if (downloadBtn) downloadBtn.addEventListener('click', downloadPNG);
+
+if (copyLinkBtn) copyLinkBtn.addEventListener('click', async () => {
+  const link = getShareLink();
+  try {
+    await navigator.clipboard.writeText(link);
+    if (shareStatus) shareStatus.textContent = 'Link copied!';
+  } catch(e) {
+    prompt('Copy this link:', link);
+  }
+});
+
+if (shareBtn) shareBtn.addEventListener('click', async () => {
+  const link = getShareLink();
+  if (navigator.share) {
+    try { await navigator.share({ title: 'My tattoo design', text: 'Check out my design', url: link }); return; }
+    catch(e) {}
+  }
+  try { await navigator.clipboard.writeText(link); } catch(e) {}
+  if (shareStatus) shareStatus.textContent = 'Link copied!';
+});

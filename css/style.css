@@ -128,106 +128,11 @@
   margin-top: 4px;
 }
 
-.try-on-area {
-  position: relative;
-  display: inline-block;
-  line-height: 0;
-  touch-action: none;
-  overflow: hidden; /* keeps stencil inside body area */
-}
-
-#imgBodyArea {
-  display: block;
-  max-width: 100%;
-}
 
 
-/* ===== THE BOX is what moves / scales / rotates ===== */
-.stencil-box {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 220px;
-  aspect-ratio: 1 / 1;
-  touch-action: none;
-  cursor: grab;
-  outline: 4px dashed transparent;
-  outline-offset: 7px;
-}
 
-.stencil-box.selected {
-  outline-color: #4a90d9;
-  cursor: move;
-}
 
-#stencilClip {
-  position: absolute;
-  inset: 0; /* exactly the same size as #imgBodyArea */
-  -webkit-mask-image: var(--body-mask);
-  mask-image: var(--body-mask);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  pointer-events: none;
-}
 
-#stencilClip .stencil-box {
-  pointer-events: auto;
-}
-
-#imgStencil {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none; /* <-- so drag hits the BOX, not the img */
-  user-select: none;
-  -webkit-user-drag: none;
-  touch-action: none;
-  transform-origin: center center;
-  will-change: transform;
-}
-
-.resize-handle,
-.rotate-handle {
-  position: absolute;
-  width: 13px;
-  height: 13px;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  touch-action: none;
-  z-index: 10;
-  display: none;
-}
-
-.resize-handle.visible,
-.rotate-handle.visible {
-  display: block;
-}
-
-.resize-handle {
-  right: -6px;
-  bottom: -6px;
-  background: #4a90d9;
-  cursor: nwse-resize !important;
-}
-
-/* above the top-center of the BOX */
-.rotate-handle {
-  left: 50%;
-  top: -22px;
-  margin-left: -6px; /* half of 12px width = perfectly centered, no transform */
-  background: #fff;
-  border-color: #4a90d9;
-  cursor: grab;
-}
-
-.rotate-handle:active {
-  cursor: grabbing;
-}
 
 .upload-section {
     min-height: 100vh;
@@ -344,3 +249,488 @@
     background: #ffb3b3;
     text-align: center;
   }
+
+
+
+
+
+
+
+
+
+
+/* Try-On Page Only */
+
+/* ---------- Base ---------- */
+
+body {
+    margin: 0;
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ---------- Nav ---------- */
+
+nav {
+    height: 60px;
+    background: #4a4a4a;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+}
+
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100%;
+    gap: 24px;
+    align-items: center;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.nav-links li:last-child {
+    margin-left: auto;
+}
+
+/* ---------- Layout ---------- */
+
+#content {
+    display: grid;
+    grid-template-columns: 230px 1fr 250px;
+    gap: 12px;
+    padding: 12px;
+    align-items: stretch;
+    height: calc(100vh - 60px);
+}
+
+/* ---------- Panels ---------- */
+
+.left-column,
+.right-column {
+    background: #6b6b6b;
+    border-radius: 10px;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: #fff;
+    min-width: 0;
+}
+
+.left-column::before {
+    content: "CONTROLS";
+    text-align: center;
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.right-column::before {
+    content: "ACCESSIBILITY";
+    text-align: center;
+    font-size: 19px;
+    font-weight: 900;
+}
+
+/* ---------- Cards ---------- */
+
+.transform-tools,
+.rotation-tools,
+.scale-tools,
+.undo-redo,
+.body-area-dropdown,
+.skin-tone,
+.body-type,
+.pain-overlay,
+.export-tools {
+    background: #c9c9c9;
+    color: #111;
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+}
+
+.transform-tools h2,
+.rotation-tools h2,
+.scale-tools h2,
+.undo-redo h2,
+.body-area-dropdown h2,
+.skin-tone h2,
+.body-type h2,
+.pain-overlay h2,
+.export-tools h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+/* ---------- Left: Sliders ---------- */
+
+.slider {
+    width: 100%;
+    accent-color: #000;
+    height: 20px;
+    cursor: pointer;
+    margin: 8px 0;
+    display: block;
+}
+
+.slider::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+}
+
+.slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #111;
+    border: none;
+}
+
+/* ---------- Left: Transform X / Y ---------- */
+
+.transform-tools {
+    position: relative;
+    padding-left: 30px;
+}
+
+.transform-tools::before {
+    content: "X";
+    position: absolute;
+    left: 10px;
+    top: 50px;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.transform-tools::after {
+    content: "Y";
+    position: absolute;
+    left: 10px;
+    top: 88px;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+/* ---------- Left: Rotation ---------- */
+/* Your HTML has 1 slider, so only 1 slider is shown. No fake 2nd one. */
+
+.rotation-tools {
+    position: relative;
+    padding-left: 30px;
+}
+
+.rotation-tools::before {
+    content: "X";
+    position: absolute;
+    left: 10px;
+    top: 50px;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+/* ---------- Left: Undo / Redo / Reset ---------- */
+
+.undo-redo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    background: transparent;
+    padding: 0;
+}
+
+.undo-redo h2 {
+    display: none;
+}
+
+.undo-redo button {
+    background: #fff;
+    border: 1px solid #111;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+#undo-button,
+#redo-button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#undo-button::after {
+    content: "↩";
+    font-size: 18px;
+}
+
+#redo-button::after {
+    content: "↪";
+    font-size: 18px;
+}
+
+#resetStencilBtn {
+    width: 100%;
+    border-radius: 16px;
+    padding: 8px 6px;
+    min-height: 34px;
+    font-size: 13px;
+}
+
+/* ---------- Center: Fixed Area, Whole Image Always Visible ---------- */
+
+.try-on-container {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+}
+
+.try-on-container > h2 {
+    display: none;
+}
+
+.try-on-area {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    border: 3px dashed #111;
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden;
+    touch-action: none;
+}
+
+/* The fix: take the image OUT of flex layout, pin it to the box,
+   and let max-width / max-height do the fitting. */
+#imgBodyArea {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    max-width: calc(100% - 16px);
+    max-height: calc(100% - 16px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+#imgBodyArea:not([src]),
+#imgBodyArea[src=""] {
+    display: none;
+}
+
+/* ---------- Stencil ---------- */
+
+.stencil-box {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 180px;
+    aspect-ratio: 1 / 1;
+    touch-action: none;
+    cursor: grab;
+    outline: 3px dashed transparent;
+    outline-offset: 6px;
+}
+
+.stencil-box.selected {
+    outline-color: #4a90d9;
+    cursor: move;
+}
+
+#stencilClip {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: var(--body-mask);
+    mask-image: var(--body-mask);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    pointer-events: none;
+}
+
+#stencilClip .stencil-box {
+    pointer-events: auto;
+}
+
+#imgStencil {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: none;
+    transform-origin: center center;
+    will-change: transform;
+}
+
+.resize-handle,
+.rotate-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    touch-action: none;
+    z-index: 10;
+    display: none;
+}
+
+.resize-handle.visible,
+.rotate-handle.visible {
+    display: block;
+}
+
+.resize-handle {
+    right: -5px;
+    bottom: -5px;
+    background: #4a90d9;
+    cursor: nwse-resize !important;
+}
+
+.rotate-handle {
+    left: 50%;
+    top: -20px;
+    margin-left: -7px;
+    background: #fff;
+    border-color: #4a90d9;
+    cursor: grab;
+}
+
+/* ---------- Right: Skin Tone ---------- */
+.skin-tone button {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid #111;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0;
+}
+
+.skin-tone button:nth-of-type(1) {
+    background: #f2f3f4;
+}
+
+.skin-tone button:nth-of-type(2) {
+    background: #f5d0b0;
+}
+
+.skin-tone button:nth-of-type(3) {
+    background: #c98a5a;
+}
+
+.skin-tone button:nth-of-type(4) {
+    background: #6e4426;
+}
+
+/* ---------- Right: Body Area ---------- */
+
+#imgBodyAreaPreview {
+    display: none;
+}
+
+#body-area-select {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: 1px solid #111;
+    background: #fff;
+    text-transform: capitalize;
+}
+
+/* ---------- Right: Body Type / Pain ---------- */
+/* Hide these if they are empty in your HTML, so they don't show as a black bar / empty card. */
+
+.body-type:empty,
+.pain-overlay:empty {
+    display: none;
+}
+
+.pain-overlay h2 {
+    font-size: 15px;
+}
+
+/* ---------- Right: Save / Export ---------- */
+/* Shows your real button text. No relabelling. */
+
+.export-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.export-tools h2 {
+    width: 100%;
+}
+
+.export-tools button {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 6px;
+    padding: 8px 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 34px;
+}
+
+#shareStatus {
+    width: 100%;
+    font-size: 12px;
+    min-height: 16px;
+    margin: 0;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 1100px) {
+    #content {
+        grid-template-columns: 1fr;
+    }
+    .try-on-container {
+        order: 1;
+    }
+    .left-column {
+        order: 2;
+    }
+    .right-column {
+        order: 3;
+    }
+    .try-on-area {
+        height: 400px;
+    }
+}
