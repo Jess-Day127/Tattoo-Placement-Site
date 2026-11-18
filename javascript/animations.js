@@ -78,11 +78,15 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   const saved = sessionStorage.getItem('stencil');
   const hasStencil = !!saved;
 
-  if (!hasStencil) {
-    box.style.display = 'none';
-    setTransformEnabled(false);
-    return;
-  }
+  function setTransformEnabled(enabled) {
+  const ids = ['posX', 'posY', 'rotSlider', 'scaleSlider', 'opacitySlider', 'flipHBtn', 'undo-button', 'redo-button', 'resetStencilBtn'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !enabled;
+  });
+  document.querySelector('.left-column')?.classList.toggle('controls-disabled', !enabled);
+}
+window.setTransformEnabled = setTransformEnabled;
 
   if (saved) stencilImg.src = saved;
 
@@ -325,6 +329,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
       updateStencilMask();
     }
   });
+  
 
   Draggable.create(rotateHandle, {
     type: 'x,y',
@@ -362,9 +367,9 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   window.saveStencilState = saveState;
   syncSliders();
   updateUndoButtons();
-  setTransformEnabled(true);
   select();
 })();
+
 
 // Stencil Before -> After Scroll
 (() => {

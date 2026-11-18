@@ -1,3 +1,28 @@
+@font-face {
+  font-family: 'TanJambore';
+  src: url("../assets/Fonts/tanjambore.woff2") format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sunday';
+  src: url("../assets/Fonts/sunday.otf") format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Grotesque';
+  src: url("../assets/Fonts/grotesque.otf") format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 .img-upload{
     display: flex;
     align-items: center;
@@ -33,13 +58,6 @@
   --gap: 10px;
   --radius: 8px;
 }
-
-/*body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}*/
 
 .flash-wall {
   width: 90vmin;
@@ -261,15 +279,11 @@
 
 /* Try-On Page Only */
 
-/* ---------- Base ---------- */
-
 body {
     margin: 0;
     background: #fff;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "TANJambore", Arial, Helvetica, sans-serif;
     color: #111;
-    font-size: 14px;
-    line-height: 1.4;
 }
 
 * {
@@ -750,67 +764,6 @@ nav {
     font-size: 15px;
 }
 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: black;  
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
 
 /* ---------- Right: Save / Export ---------- */
 /* Shows your real button text. No relabelling. */
@@ -844,6 +797,232 @@ input:checked + .slider:before {
     min-height: 16px;
     margin: 0;
 }
+
+/* Pain Map switch - renamed so it can't break the left sliders */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.pain-toggle {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: black;
+  transition: .4s;
+}
+.pain-toggle:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+input:checked + .pain-toggle {
+  background-color: #2196F3;
+}
+input:checked + .pain-toggle:before {
+  transform: translateX(26px);
+}
+.pain-toggle.round {
+  border-radius: 34px;
+}
+.pain-toggle.round:before {
+  border-radius: 50%;
+}
+
+
+/* ========== HOME PAGE - layout + fonts + colours + light styling ========== */
+/* No backgrounds, no splats, no waves */
+
+/* --- Nav --- */
+nav {
+  background: black;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  overflow: hidden; /* stops logo spilling out */
+}
+.logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.logo img {
+  height: 44px; /* was way bigger, this fits inside 64px nav */
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  display: block;
+  filter: invert();
+}
+.nav-links {
+  display: flex;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+}
+/* Kills the old Try-On rule that pushed Try-on to the far right */
+.nav-links li:last-child {
+  margin-left: 0;
+}
+.nav-links a {
+  font-family: 'Sunday', Arial, sans-serif;
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: 3px;
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+}
+.nav-links a:hover {
+  border-bottom-color: #fff;
+}
+
+/* --- Hero --- */
+.hero-section {
+  padding: 80px 20px 70px;
+  text-align: center;
+}
+.hero {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px; /* forces space between WELCOME / TITLE / TEXT / BUTTON */
+}
+.hero h2 {
+  font-family: 'Sunday', Arial, sans-serif;
+  color: #111;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.hero h1 {
+  font-family: 'TanJambore', Arial, sans-serif;
+  color: #3A1400;
+  font-size: clamp(56px, 10vw, 110px);
+  line-height: 1.05; /* was 0.85 - that's what caused the overlap */
+  margin: 0;
+}
+.hero p {
+  font-family: 'Grotesque', Arial, sans-serif;
+  color: #111;
+  font-size: 17px;
+  max-width: 520px;
+  margin: 0;
+  line-height: 1.6;
+}
+.hero button {
+  font-family: 'TanJambore', Arial, sans-serif;
+  color: #fff;
+  background: #4A1A00;
+  border: 2px solid #4A1A00;
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* --- Features --- */
+.features-section, .hiw-section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  text-align: center;
+}
+.features-section {
+  border-top: 1px solid #ddd;
+}
+.features-section h2, .hiw-section h2 {
+  font-family: 'TanJambore', Arial, sans-serif;
+  color: #3A1400;
+  font-size: 38px;
+  margin: 0 0 8px;
+}
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  text-align: left;
+  margin-top: 28px;
+}
+.feature {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 22px;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.feature:hover {
+  transform: translateY(-3px);
+  border-color: #4A1A00;
+}
+.feature h3 {
+  font-family: 'TanJambore', Arial, sans-serif;
+  color: #111;
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.feature p, .how-it-works p {
+  font-family: 'Grotesque', Arial, sans-serif;
+  color: #111;
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+
+/* --- How it works --- */
+.hiw-section {
+  border-top: 1px solid #ddd;
+}
+.how-it-works {
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+}
+.how-it-works p {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #ddd;
+}
+.how-it-works p:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 28px 20px;
+  font-family: 'Grotesque', Arial, sans-serif;
+  color: #111;
+  border-top: 1px solid #ddd;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .features { grid-template-columns: 1fr; }
+  .hero-section { padding: 60px 20px 50px; }
+}
+
+
 
 /* ---------- Mobile ---------- */
 

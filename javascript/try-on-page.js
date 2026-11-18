@@ -412,10 +412,12 @@ function showStencil() {
   if (!stencilBox) return;
   if (!stencilImage) {
     stencilBox.style.display = 'none';
+    if (window.setTransformEnabled) window.setTransformEnabled(false);
     return;
   }
   stencilImg.src = stencilImage;
   stencilBox.style.display = 'block';
+  if (window.setTransformEnabled) window.setTransformEnabled(true);
 }
 
 if (document.getElementById('imgBodyArea')) {
@@ -423,10 +425,8 @@ if (document.getElementById('imgBodyArea')) {
   showStencil();
 }
 
-// --- Export: Download + Share Design (img) ---
-
+// --- Export: Download only ---
 const downloadBtn = document.getElementById('downloadBtn');
-const shareBtn = document.getElementById('shareBtn');
 const shareStatus = document.getElementById('shareStatus');
 
 function getBodyImg() {
@@ -438,7 +438,6 @@ function getStencilImg() {
   return document.getElementById('imgStencil');
 }
 
-// Render body + stencil to one canvas - used by BOTH buttons
 function renderDesignPNG() {
   const bodyImg = getBodyImg();
   const stencil = getStencilImg();
@@ -473,7 +472,6 @@ function renderDesignPNG() {
   sCtx.drawImage(stencil, -w/2, -h/2, w, h);
   sCtx.restore();
 
-  // Mask - erases stencil outside the body
   const maskCanvas = document.createElement('canvas');
   maskCanvas.width = canvas.width;
   maskCanvas.height = canvas.height;
@@ -495,15 +493,10 @@ function renderDesignPNG() {
   return canvas;
 }
 
-function canvasToBlob(canvas) {
-  return new Promise(res => canvas.toBlob(res, 'image/png'));
-}
-
-// 1. DOWNLOAD
 async function downloadPNG() {
   const canvas = renderDesignPNG();
   if (!canvas) return;
-  const blob = await canvasToBlob(canvas);
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.download = 'my-tattoo-design.png';
@@ -513,31 +506,7 @@ async function downloadPNG() {
   if (shareStatus) shareStatus.textContent = 'Downloaded!';
 }
 
-// 2. SHARE DESIGN (IMG)
-async function shareDesign() {
-  const canvas = renderDesignPNG();
-  if (!canvas) return;
-  try {
-    const blob = await canvasToBlob(canvas);
-    const file = new File([blob], 'my-tattoo-design.png', { type: 'image/png' });
-
-    // Phone: opens native share sheet (WhatsApp, Instagram, Gallery...)
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'My tattoo design' });
-      if (shareStatus) shareStatus.textContent = 'Shared!';
-      return;
-    }
-    throw new Error('Files not shareable');
-  } catch (e) {
-    // Desktop / share cancelled / not allowed -> just download instead
-    // so Share never does nothing
-    if (e.name !== 'AbortError') await downloadPNG();
-  }
-}
-
 if (downloadBtn) downloadBtn.addEventListener('click', downloadPNG);
-if (shareBtn) shareBtn.addEventListener('click', shareDesign);
-
 
 // Flip & Transparancy
 window.flipX = 1;
