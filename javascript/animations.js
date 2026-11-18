@@ -48,7 +48,6 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     tl.set(details, { overflow: "hidden" })
       .to(detailContent, { yPercent: -100 })
       .to(items, { opacity: 1, stagger: { amount: 0.7, from: items.indexOf(itemToClose), grid: "auto" } })
-      .to(".flash-wall", { backgroundColor: "lightcoral" }, "<");
     Flip.from(state, {
       scale: true,
       duration: 0.5,
