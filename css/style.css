@@ -615,6 +615,7 @@ nav {
 /* ---------- Stencil ---------- */
 
 .try-on-area {
+    position: relative;
     overflow: visible; /* box can go outside body, but not get cut by area */
 }
 

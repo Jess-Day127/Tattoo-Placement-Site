@@ -92,33 +92,43 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     };
   }
 
+  function clampToStage() {
+    const stageRect = stage.getBoundingClientRect();
+    const boxRect = box.getBoundingClientRect();
+    // How far is the box centre from the stage centre right now?
+    const boxCx = boxRect.left + boxRect.width / 2;
+    const boxCy = boxRect.top + boxRect.height / 2;
+    const stageCx = stageRect.left + stageRect.width / 2;
+    const stageCy = stageRect.top + stageRect.height / 2;
+    // How far CAN it go before an edge hits?
+    const maxDx = Math.max(0, (stageRect.width - boxRect.width) / 2);
+    const maxDy = Math.max(0, (stageRect.height - boxRect.height) / 2);
+    let dx = boxCx - stageCx;
+    let dy = boxCy - stageCy;
+    dx = Math.max(-maxDx, Math.min(maxDx, dx));
+    dy = Math.max(-maxDy, Math.min(maxDy, dy));
+    // Push it back by the difference
+    const curX = gsap.getProperty(box, 'x');
+    const curY = gsap.getProperty(box, 'y');
+    gsap.set(box, {
+      x: curX + (stageCx + dx - boxCx),
+      y: curY + (stageCy + dy - boxCy)
+    });
+  }
+
   function updateSliderLimits() {
     if (!posX || !posY) return;
     const stageRect = stage.getBoundingClientRect();
     const boxRect = box.getBoundingClientRect();
-    // How far can the centre move before an edge hits?
     const maxX = Math.max(0, (stageRect.width - boxRect.width) / 2);
     const maxY = Math.max(0, (stageRect.height - boxRect.height) / 2);
     posX.min = -maxX;
     posX.max = maxX;
     posY.min = -maxY;
     posY.max = maxY;
-    // Scale can't be bigger than the stage itself
     if (scaleSlider) {
       scaleSlider.max = Math.floor(Math.min(stageRect.width, stageRect.height));
     }
-  }
-
-  function clampToStage() {
-    const stageRect = stage.getBoundingClientRect();
-    const boxRect = box.getBoundingClientRect();
-    const maxX = Math.max(0, (stageRect.width - boxRect.width) / 2);
-    const maxY = Math.max(0, (stageRect.height - boxRect.height) / 2);
-    let x = gsap.getProperty(box, 'x');
-    let y = gsap.getProperty(box, 'y');
-    x = Math.max(-maxX, Math.min(maxX, x));
-    y = Math.max(-maxY, Math.min(maxY, y));
-    gsap.set(box, { x, y });
   }
 
   function updateStencilMask() {
@@ -256,10 +266,9 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   Draggable.create(box, {
     type: 'x,y',
     bounds: stage,
-    edgeResistance: 0.8,
     onPress() { select(); },
-    onDrag() { syncSliders(); updateStencilMask(); },
-    onRelease() { saveState(); syncSliders(); updateStencilMask(); }
+    onDrag() { clampToStage(); syncSliders(); updateStencilMask(); },
+    onRelease() { clampToStage(); saveState(); syncSliders(); updateStencilMask(); }
   });
 
   Draggable.create(resizeHandle, {
