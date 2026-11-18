@@ -37,6 +37,17 @@
             <input type="range" min="40" max="1127" value="220" class="slider" id="scaleSlider">
         </div>
 
+        <div class="flip-tools">
+            <h2>Flip</h2>
+            <button id="flipHBtn">Flip ↔</button>
+        </div>
+
+        <div class="transp-tools">
+            <h2>Transparency</h2>
+            <input type="range" min="0" max="100" value="100" class="slider" id="opacitySlider">
+            <span id="opacityValue">100%</span>
+        </div>
+
         <div class="undo-redo">
             <h2>Undo/Redo</h2>
             <button id="undo-button">Undo</button>
@@ -50,15 +61,16 @@
         <div class="try-on-area">
             <img id="imgBodyArea" alt="Body area">
 
-            <div id="stencilClip">
-                <div class="stencil-box" id="stencilBox">
+            <div class="stencil-box" id="stencilBox">
+                <div id="stencilClip">
                     <img id="imgStencil" alt="Your design">
-                    <div class="resize-handle" id="resizeHandle"></div>
-                    <div class="rotate-handle" id="rotateHandle"></div>
                 </div>
+                <div class="resize-handle" id="resizeHandle"></div>
+                <div class="rotate-handle" id="rotateHandle"></div>
             </div>
         </div>
     </section>
+
 
     <section class="right-column">
         <div class="body-area-dropdown">

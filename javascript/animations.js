@@ -92,6 +92,23 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     };
   }
 
+  function updateStencilMask() {
+    const bodyImg = document.getElementById('imgBodyArea');
+    const clip = document.getElementById('stencilClip');
+    if (!bodyImg || !clip || !box) return;
+    const bodyRect = bodyImg.getBoundingClientRect();
+    const boxRect = box.getBoundingClientRect();
+    const maskUrl = `url("${bodyImg.src}")`;
+    clip.style.webkitMaskImage = maskUrl;
+    clip.style.maskImage = maskUrl;
+    clip.style.webkitMaskSize = `${bodyRect.width}px ${bodyRect.height}px`;
+    clip.style.maskSize = `${bodyRect.width}px ${bodyRect.height}px`;
+    clip.style.webkitMaskPosition = `${bodyRect.left - boxRect.left}px ${bodyRect.top - boxRect.top}px`;
+    clip.style.maskPosition = `${bodyRect.left - boxRect.left}px ${bodyRect.top - boxRect.top}px`;
+  }
+  window.updateStencilMask = updateStencilMask;
+  window.addEventListener('resize', updateStencilMask);
+
   function select() {
     box.classList.add('selected');
     resizeHandle.classList.add('visible');
@@ -122,19 +139,33 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   let redoStack = [];
   let isApplying = false;
 
-  function getState() {
+    function getState() {
     return {
       x: gsap.getProperty(box, 'x'),
       y: gsap.getProperty(box, 'y'),
       rotation: gsap.getProperty(box, 'rotation'),
       width: box.offsetWidth,
+      flipX: window.flipX ?? 1,
+      opacity: stencilImg ? Number(stencilImg.style.opacity || 1) : 1,
     };
   }
 
   function applyState(s) {
     isApplying = true;
     gsap.set(box, { x: s.x, y: s.y, rotation: s.rotation, width: s.width, scale: 1 });
+    window.flipX = s.flipX ?? 1;
+    if (stencilImg) {
+      stencilImg.style.scale = `${window.flipX} 1`;
+      stencilImg.style.opacity = s.opacity ?? 1;
+    }
+    const opSlider = document.getElementById('opacitySlider');
+    const opVal = document.getElementById('opacityValue');
+    const flipBtn = document.getElementById('flipHBtn');
+    if (opSlider) opSlider.value = Math.round((s.opacity ?? 1) * 100);
+    if (opVal) opVal.textContent = Math.round((s.opacity ?? 1) * 100) + '%';
+    if (flipBtn) flipBtn.classList.toggle('active', window.flipX === -1);
     syncSliders();
+    updateStencilMask();
     isApplying = false;
   }
 
@@ -190,12 +221,12 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     syncSliders();
   });
 
-  Draggable.create(box, {
-  type: 'x,y',
-  onPress() { select(); },
-  onDrag() { syncSliders(); },
-  onRelease() { saveState(); syncSliders(); }
-});
+    Draggable.create(box, {
+    type: 'x,y',
+    onPress() { select(); },
+    onDrag() { syncSliders(); updateStencilMask(); },
+    onRelease() { saveState(); syncSliders(); updateStencilMask(); }
+  });
 
   Draggable.create(resizeHandle, {
     type: 'x,y',
@@ -221,11 +252,13 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
       gsap.set(box, { width: newWidth, scale: 1 });
       gsap.set(resizeHandle, { x: 0, y: 0 });
       syncSliders();
+      updateStencilMask();
     },
     onRelease() {
       gsap.set(resizeHandle, { x: 0, y: 0 });
       saveState();
       syncSliders();
+      updateStencilMask();
     }
   });
 
@@ -252,11 +285,13 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
       gsap.set(box, { rotation: startRotation + delta });
       gsap.set(rotateHandle, { x: 0, y: 0 });
       syncSliders();
+      updateStencilMask();
     },
     onRelease() {
       gsap.set(rotateHandle, { x: 0, y: 0 });
       saveState();
       syncSliders();
+      updateStencilMask();
     }
   });
   saveState();
@@ -264,7 +299,6 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   updateUndoButtons();
   select();
 })();
-
 
 /* Scroll to stencil */
 (() => {

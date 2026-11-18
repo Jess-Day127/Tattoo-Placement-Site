@@ -445,6 +445,74 @@ nav {
     font-size: 13px;
 }
 
+/* ---------- Left: Flip / Transparency ---------- */
+
+.flip-tools,
+.transp-tools {
+    background: #c9c9c9;
+    color: #111;
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+}
+
+.flip-tools h2,
+.transp-tools h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+/* Flip buttons */
+.flip-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.flip-tools h2 {
+    width: 100%;
+}
+
+.flip-tools button {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 6px;
+    padding: 8px 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 34px;
+}
+
+.flip-tools button.active {
+    background: #111;
+    color: #fff;
+}
+
+/* Transparency slider */
+.transp-tools {
+    position: relative;
+    padding-bottom: 10px;
+}
+
+#opacityValue {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+/* The design itself - flip + fade live here, separate from your transform */
+#imgStencil {
+    opacity: 1;
+}
+
+
+
 /* ---------- Left: Undo / Redo / Reset ---------- */
 
 .undo-redo {
@@ -543,7 +611,12 @@ nav {
     display: none;
 }
 
+
 /* ---------- Stencil ---------- */
+
+.try-on-area {
+    overflow: visible; /* box can go outside body, but not get cut by area */
+}
 
 .stencil-box {
     position: absolute;
@@ -555,6 +628,7 @@ nav {
     cursor: grab;
     outline: 3px dashed transparent;
     outline-offset: 6px;
+    overflow: visible; /* NEVER clip the box */
 }
 
 .stencil-box.selected {
@@ -562,22 +636,14 @@ nav {
     cursor: move;
 }
 
+/* Only this layer is masked. It fills the box exactly. */
 #stencilClip {
     position: absolute;
     inset: 0;
-    -webkit-mask-image: var(--body-mask);
-    mask-image: var(--body-mask);
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
+    overflow: hidden;
+    pointer-events: none;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    pointer-events: none;
-}
-
-#stencilClip .stencil-box {
-    pointer-events: auto;
 }
 
 #imgStencil {
@@ -593,6 +659,7 @@ nav {
     will-change: transform;
 }
 
+/* ---------- Handles ---------- */
 .resize-handle,
 .rotate-handle {
     position: absolute;
@@ -625,6 +692,7 @@ nav {
     border-color: #4a90d9;
     cursor: grab;
 }
+
 
 /* ---------- Right: Skin Tone ---------- */
 .skin-tone button {

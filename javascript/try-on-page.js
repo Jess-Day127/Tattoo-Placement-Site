@@ -256,7 +256,6 @@ function changeSkinTone(tone) {
 function changeBodyType(type) {
     currentBodyType = type;
     updateImage();
-    
 }
 
 function changeBodyArea(area) {
@@ -268,24 +267,14 @@ function changeBodyArea(area) {
 function updateImage() {
   const img = document.getElementById('imgBodyArea');
   if (!img) return;
-
   const areaData = bodyImages[currentArea];
   if (!areaData) return;
-
-  // fallback: if this body type doesn't exist for this area, use type 1
   const typeData = areaData[currentBodyType] || areaData['1'];
   if (!typeData) return;
-
   const newSrc = typeData[currentSkinTone] ?? typeData.light ?? typeData.greyscale;
   img.src = newSrc;
-
-  const clip = document.getElementById('stencilClip');
-  if (clip) {
-    const maskUrl = `url("${newSrc}")`;
-    clip.style.setProperty('--body-mask', maskUrl);
-    clip.style.webkitMaskImage = maskUrl;
-    clip.style.maskImage = maskUrl;
-  }
+  img.onload = () => { if (window.updateStencilMask) window.updateStencilMask(); };
+  if (img.complete && window.updateStencilMask) window.updateStencilMask();
 }
 
 function resetStencilPosition() {
@@ -414,6 +403,8 @@ async function downloadPNG() {
   sCtx.save();
   sCtx.translate(cx, cy);
   sCtx.rotate(rot);
+  sCtx.scale(flipX, 1);
+  sCtx.globalAlpha = imgStencilEl ? Number(imgStencilEl.style.opacity || 1) : 1;
   sCtx.drawImage(stencil, -w/2, -h/2, w, h);
   sCtx.restore();
 
@@ -474,3 +465,39 @@ if (shareBtn) shareBtn.addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(link); } catch(e) {}
   if (shareStatus) shareStatus.textContent = 'Link copied!';
 });
+
+
+
+
+// ---------- Flip + Transparency (Undo lives in animation.js) ----------
+window.flipX = 1;
+const flipHBtn = document.getElementById('flipHBtn');
+const opacitySlider = document.getElementById('opacitySlider');
+const opacityValue = document.getElementById('opacityValue');
+const stencilEl = document.getElementById('imgStencil');
+
+function applyFlip() {
+  if (stencilEl) stencilEl.style.scale = `${window.flipX} 1`;
+}
+
+// Flip: animation.js saves state on its own saveState, but it can't see
+// this click, so we trigger its save by faking a slider change is messy.
+// Instead: just flip - animation.js will save the NEXT drag/slider change.
+// If you want Flip itself undoable, keep this one line: it pushes to
+// animation.js's stack via the reset button trick is not needed -
+// see note below.
+if (flipHBtn) {
+  flipHBtn.addEventListener('click', () => {
+    window.flipX = window.flipX === 1 ? -1 : 1;
+    flipHBtn.classList.toggle('active', window.flipX === -1);
+    applyFlip();
+  });
+}
+
+if (opacitySlider) {
+  opacitySlider.addEventListener('input', () => {
+    const v = Number(opacitySlider.value);
+    if (stencilEl) stencilEl.style.opacity = v / 100;
+    if (opacityValue) opacityValue.textContent = v + '%';
+  });
+}
