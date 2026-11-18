@@ -404,47 +404,67 @@ window.setTransformEnabled = setTransformEnabled;
 
 gsap.registerPlugin(ScrollTrigger);
 
-const panels = gsap.utils.toArray(".section");
-panels.pop(); // don't pin the last one (How it works) so footer shows
+// OG animation - desktop only. Mobile gets normal scroll.
+const mm = gsap.matchMedia();
 
-panels.forEach((panel) => {
-  const inner = panel.querySelector(".section-inner");
-  if (!inner) return;
+mm.add("(min-width: 601px)", () => {
+  const panels = gsap.utils.toArray(".section");
+  panels.pop(); // don't pin the last one (FAQ) so footer shows
 
-  const panelHeight = inner.offsetHeight;
-  const windowHeight = window.innerHeight;
-  const difference = panelHeight - windowHeight;
+  panels.forEach((panel) => {
+    const inner = panel.querySelector(".section-inner");
+    if (!inner) return;
 
-  // ratio for fake-scrolling if panel is taller than window (Features)
-  const fakeScrollRatio = difference > 0 ? (difference / (difference + windowHeight)) : 0;
+    const panelHeight = inner.offsetHeight;
+    const windowHeight = window.innerHeight;
+    const difference = panelHeight - windowHeight;
 
-  if (fakeScrollRatio) {
-    panel.style.marginBottom = panelHeight * fakeScrollRatio + "px";
-  }
+    // ratio for fake-scrolling if panel is taller than window (Features)
+    const fakeScrollRatio = difference > 0 ? (difference / (difference + windowHeight)) : 0;
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: panel,
-      start: "bottom bottom",
-      end: () => fakeScrollRatio ? `+=${inner.offsetHeight}` : "bottom top",
-      pinSpacing: false,
-      pin: true,
-      scrub: true,
-      invalidateOnRefresh: true
+    if (fakeScrollRatio) {
+      panel.style.marginBottom = panelHeight * fakeScrollRatio + "px";
     }
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: panel,
+        start: "bottom bottom",
+        end: () => fakeScrollRatio ? `+=${inner.offsetHeight}` : "bottom top",
+        pinSpacing: false,
+        pin: true,
+        scrub: true,
+        invalidateOnRefresh: true
+      }
+    });
+
+    if (fakeScrollRatio) {
+      tl.to(inner, {
+        yPercent: -100,
+        y: windowHeight,
+        duration: 1 / (1 - fakeScrollRatio) - 1,
+        ease: "none"
+      });
+    }
+
+    tl.fromTo(panel, { scale: 1, opacity: 1 }, { scale: 0.7, opacity: 0.5, duration: 0.9 })
+      .to(panel, { opacity: 0, duration: 0.1 });
   });
 
-  if (fakeScrollRatio) {
-    tl.to(inner, {
-      yPercent: -100,
-      y: windowHeight,
-      duration: 1 / (1 - fakeScrollRatio) - 1,
-      ease: "none"
-    });
-  }
+  window.addEventListener("load", () => ScrollTrigger.refresh());
 
-  tl.fromTo(panel, { scale: 1, opacity: 1 }, { scale: 0.7, opacity: 0.5, duration: 0.9 })
-    .to(panel, { opacity: 0, duration: 0.1 });
+  return () => {
+    panels.forEach((p) => { p.style.marginBottom = ""; });
+  };
 });
 
-window.addEventListener("load", () => ScrollTrigger.refresh());
+mm.add("(max-width: 600px)", () => {
+  // Mobile: clear any leftover OG inline styles
+  gsap.utils.toArray(".section").forEach((panel) => {
+    panel.style.marginBottom = "";
+    gsap.set(panel, { clearProps: "all" });
+    const inner = panel.querySelector(".section-inner");
+    if (inner) gsap.set(inner, { clearProps: "all" });
+  });
+  ScrollTrigger.refresh();
+});
