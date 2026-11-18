@@ -21,7 +21,6 @@ if (dropArea && inputFile && imageView) {
 
         const imgLink = URL.createObjectURL(file);
 
-        // BEFORE - never overwritten
         imageView.style.backgroundImage = `url(${imgLink})`;
         imageView.style.backgroundSize = 'contain';
         imageView.style.backgroundRepeat = 'no-repeat';
@@ -31,7 +30,6 @@ if (dropArea && inputFile && imageView) {
         if (uploadIcon) uploadIcon.style.display = 'none';
         if (uploadHint) uploadHint.style.display = 'none';
 
-        // reset to BEFORE state: hide AFTER, show Convert, hide Scroll + Try On
         if (afterLayer) afterLayer.style.visibility = 'hidden';
         if (removeBtn) { removeBtn.style.display = 'inline-block'; removeBtn.disabled = false; }
         if (tryOnBtn) tryOnBtn.style.display = 'none';
@@ -69,12 +67,9 @@ if (dropArea && inputFile && imageView) {
             const noBgBlob = await removeBackground(currentFile);
             const url = URL.createObjectURL(noBgBlob);
 
-            // BEFORE stays in imageView - DO NOT touch it
-            // AFTER only:
             if (afterImg) afterImg.src = url;
             if (afterLayer) afterLayer.style.visibility = 'visible';
 
-            // BUTTON SWAP: hide Convert, show Scroll + Try On
             if (removeBtn) removeBtn.style.display = 'none';
             if (tryOnBtn) tryOnBtn.style.display = 'inline-block';
 
@@ -93,7 +88,7 @@ if (dropArea && inputFile && imageView) {
     });
 }
 
-// ===== FLASH WALL - Use this design =====
+// Flash Wall Design
 const useDesignBtn = document.getElementById('useDesignBtn');
 const detailImg = document.querySelector('.detail img');
 

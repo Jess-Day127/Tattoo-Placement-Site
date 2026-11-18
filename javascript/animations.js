@@ -1,6 +1,6 @@
 gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
 
-/* ===== Flash Wall - ONLY on pages with .detail / .item ===== */
+// Flash Wall
 (() => {
   const items = gsap.utils.toArray(".item");
   const details = document.querySelector('.detail');
@@ -65,7 +65,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   });
 })();
 
-/* ===== Draggable + resize + rotate - ONLY on try-on ===== */
+// Drag, Resize & Rotate
 (() => {
   const stage = document.querySelector('.try-on-area');
   const box = document.getElementById('stencilBox');
@@ -78,11 +78,10 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   const saved = sessionStorage.getItem('stencil');
   const hasStencil = !!saved;
 
-  // No design = no transform box, no controls
   if (!hasStencil) {
     box.style.display = 'none';
     setTransformEnabled(false);
-    return; // don't create Draggables, don't call select()
+    return;
   }
 
   if (saved) stencilImg.src = saved;
@@ -175,7 +174,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     if (!box.contains(e.target)) deselect();
   });
 
-    // ===== Sliders + Undo/Redo =====
+    // Sliders & Undo/Redo
   const posX = document.getElementById('posX');
   const posY = document.getElementById('posY');
   const rotSlider = document.getElementById('rotSlider');
@@ -367,12 +366,12 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   select();
 })();
 
-/* Scroll to stencil */
+// Stencil Before -> After Scroll
 (() => {
   const uploadSection = document.querySelector('.upload-section');
   const afterLayer = document.getElementById('afterLayer');
   const afterImg = document.getElementById('afterImg');
-  if (!uploadSection || !afterLayer || !afterImg) return; // skip on home + try-on
+  if (!uploadSection || !afterLayer || !afterImg) return;
 
   gsap.set("#afterLayer", { xPercent: 100 });
   gsap.set("#afterImg", { xPercent: -100 });
@@ -395,6 +394,5 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     .to("#afterLayer", { xPercent: 0 }, 0)
     .to("#afterImg", { xPercent: 0 }, 0);
 
-  // so upload.js can enable/disable it
   window.wipe = wipe;
 })();

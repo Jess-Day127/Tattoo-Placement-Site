@@ -1,4 +1,4 @@
-// Change Body Area Skin Tone
+// Change Body Area Type
 const bodyImages = {
     torso: {
         1: { // Body Type 1
@@ -240,6 +240,7 @@ const bodyImages = {
     }
 };
 
+// Pain Level Overlay
 const painImages = {
     torso: {
         1: './assets/Body Areas/Pain/torso 1.png',
@@ -327,7 +328,7 @@ function updatePainOverlay() {
   overlay.classList.toggle('visible', painVisible && !!src);
 }
 
-let currentArea = 'head'; // default
+let currentArea = 'head';
 let currentBodyType = '1';
 let currentSkinTone = 'greyscale'; // default
 
@@ -362,14 +363,12 @@ function updateBodyTypeButtons() {
   const variations = Object.keys(bodyImages[currentArea] || {});
   const count = variations.length;
 
-  // Only 1 variation - hide the whole card, there's nothing to choose
   if (count <= 1) {
     section.style.display = 'none';
     currentBodyType = '1';
     return;
   }
 
-  // 2+ variations - show card, hide/disable the buttons that don't exist
   section.style.display = '';
   const buttons = section.querySelectorAll('button');
   buttons.forEach(btn => {
@@ -380,7 +379,6 @@ function updateBodyTypeButtons() {
     btn.classList.toggle('active', type === String(currentBodyType));
   });
 }
-
 
 function updateImage() {
   const img = document.getElementById('imgBodyArea');
@@ -399,7 +397,6 @@ function updateImage() {
 
 function resetStencilPosition() {
   if (!stencilBox) return;
-  // back to center, no rotation, default size
   gsap.set(stencilBox, {
     x: 0,
     y: 0,
@@ -426,13 +423,12 @@ if (document.getElementById('imgBodyArea')) {
   showStencil();
 }
 
-// Export & Share
+// --- Export: Download + Share Design (img) ---
+
 const downloadBtn = document.getElementById('downloadBtn');
-const copyLinkBtn = document.getElementById('copyLinkBtn');
 const shareBtn = document.getElementById('shareBtn');
 const shareStatus = document.getElementById('shareStatus');
 
-// Find the body + stencil images - tries both IDs so it can't be null
 function getBodyImg() {
   return document.getElementById('imgBodyArea')
       || document.getElementById('imgBody')
@@ -442,75 +438,11 @@ function getStencilImg() {
   return document.getElementById('imgStencil');
 }
 
-function getDesignState() {
-  const stencilElNow = document.getElementById('imgStencil');
-  return {
-    skin: currentSkinTone,
-    body: currentBodyType,
-    area: currentArea,
-    flipX: window.flipX ?? 1,
-    opacity: stencilElNow ? Number(stencilElNow.style.opacity || 1) : 1,
-    x: stencilBox ? gsap.getProperty(stencilBox, 'x') : 0,
-    y: stencilBox ? gsap.getProperty(stencilBox, 'y') : 0,
-    rotation: stencilBox ? gsap.getProperty(stencilBox, 'rotation') : 0,
-    width: stencilBox ? stencilBox.offsetWidth : 220,
-  };
-}
-
-function getShareLink() {
-  const state = getDesignState();
-  const encoded = btoa(JSON.stringify(state));
-  return `${location.origin}${location.pathname}#design=${encoded}`;
-}
-
-function loadFromLink() {
-  const hash = location.hash;
-  if (!hash.startsWith('#design=')) return;
-  try {
-    const state = JSON.parse(atob(hash.replace('#design=', '')));
-
-    // 1. Restore body FIRST, on their own lines - not inside gsap.set
-    if (state.area) currentArea = state.area;
-    if (state.skin) currentSkinTone = state.skin;
-    if (state.body) currentBodyType = state.body;
-    updateImage();
-
-    // 2. Restore flip + opacity
-    if (state.flipX) {
-      window.flipX = state.flipX;
-      const img = document.getElementById('imgStencil');
-      if (img) img.style.scale = `${window.flipX} 1`;
-      const flipBtn = document.getElementById('flipHBtn');
-      if (flipBtn) flipBtn.classList.toggle('active', window.flipX === -1);
-    }
-    if (state.opacity != null) {
-      const img = document.getElementById('imgStencil');
-      if (img) img.style.opacity = state.opacity;
-      const opSlider = document.getElementById('opacitySlider');
-      const opVal = document.getElementById('opacityValue');
-      if (opSlider) opSlider.value = Math.round(state.opacity * 100);
-      if (opVal) opVal.textContent = Math.round(state.opacity * 100) + '%';
-    }
-
-    // 3. Restore position LAST, as a plain object
-    if (stencilBox) {
-      gsap.set(stencilBox, {
-        x: state.x || 0,
-        y: state.y || 0,
-        rotation: state.rotation || 0,
-        width: state.width || 220,
-        scale: 1
-      });
-    }
-
-    if (window.updateStencilMask) window.updateStencilMask();
-  } catch(e) { console.log('Bad share link', e); }
-}
-
-async function downloadPNG() {
+// Render body + stencil to one canvas - used by BOTH buttons
+function renderDesignPNG() {
   const bodyImg = getBodyImg();
   const stencil = getStencilImg();
-  if (!bodyImg || !stencil) return;
+  if (!bodyImg || !stencil) return null;
 
   const canvas = document.createElement('canvas');
   canvas.width = bodyImg.naturalWidth;
@@ -518,7 +450,6 @@ async function downloadPNG() {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(bodyImg, 0, 0);
 
-  // 1. Draw stencil on its own canvas
   const stencilCanvas = document.createElement('canvas');
   stencilCanvas.width = canvas.width;
   stencilCanvas.height = canvas.height;
@@ -528,7 +459,6 @@ async function downloadPNG() {
   const stencilRect = stencil.getBoundingClientRect();
   const scaleX = canvas.width / bodyRect.width;
   const scaleY = canvas.height / bodyRect.height;
-
   const cx = (stencilRect.left - bodyRect.left + stencilRect.width / 2) * scaleX;
   const cy = (stencilRect.top - bodyRect.top + stencilRect.height / 2) * scaleY;
   const w = stencilRect.width * scaleX;
@@ -543,10 +473,7 @@ async function downloadPNG() {
   sCtx.drawImage(stencil, -w/2, -h/2, w, h);
   sCtx.restore();
 
-  
-
-  // 2. Build a mask from the body image
-  // Corner pixel = background colour (the gap / outside the body)
+  // Mask - erases stencil outside the body
   const maskCanvas = document.createElement('canvas');
   maskCanvas.width = canvas.width;
   maskCanvas.height = canvas.height;
@@ -554,59 +481,65 @@ async function downloadPNG() {
   mCtx.drawImage(bodyImg, 0, 0);
   const imgData = mCtx.getImageData(0, 0, canvas.width, canvas.height);
   const d = imgData.data;
-  // sample top-left corner as background
   const br = d[0], bg = d[1], bb = d[2];
-
   for (let i = 0; i < d.length; i += 4) {
-    const r = d[i], g = d[i+1], b = d[i+2];
-    // how close is this pixel to background colour?
-    const dist = Math.abs(r - br) + Math.abs(g - bg) + Math.abs(b - bb);
-    // if it's background -> transparent, else -> keep it
+    const dist = Math.abs(d[i] - br) + Math.abs(d[i+1] - bg) + Math.abs(d[i+2] - bb);
     d[i+3] = dist < 60 ? 0 : 255;
   }
   mCtx.putImageData(imgData, 0, 0);
-
-  // 3. Apply mask to stencil - erases the gap bit
   sCtx.globalCompositeOperation = 'destination-in';
   sCtx.drawImage(maskCanvas, 0, 0);
   sCtx.globalCompositeOperation = 'source-over';
-
-  // 4. Put masked stencil on body
   ctx.drawImage(stencilCanvas, 0, 0);
 
+  return canvas;
+}
+
+function canvasToBlob(canvas) {
+  return new Promise(res => canvas.toBlob(res, 'image/png'));
+}
+
+// 1. DOWNLOAD
+async function downloadPNG() {
+  const canvas = renderDesignPNG();
+  if (!canvas) return;
+  const blob = await canvasToBlob(canvas);
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.download = 'my-tattoo-design.png';
-  a.href = canvas.toDataURL('image/png');
+  a.href = url;
   a.click();
+  URL.revokeObjectURL(url);
   if (shareStatus) shareStatus.textContent = 'Downloaded!';
 }
 
-if (downloadBtn) downloadBtn.addEventListener('click', downloadPNG);
-
-if (copyLinkBtn) copyLinkBtn.addEventListener('click', async () => {
-  const link = getShareLink();
+// 2. SHARE DESIGN (IMG)
+async function shareDesign() {
+  const canvas = renderDesignPNG();
+  if (!canvas) return;
   try {
-    await navigator.clipboard.writeText(link);
-    if (shareStatus) shareStatus.textContent = 'Link copied!';
-  } catch(e) {
-    prompt('Copy this link:', link);
+    const blob = await canvasToBlob(canvas);
+    const file = new File([blob], 'my-tattoo-design.png', { type: 'image/png' });
+
+    // Phone: opens native share sheet (WhatsApp, Instagram, Gallery...)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'My tattoo design' });
+      if (shareStatus) shareStatus.textContent = 'Shared!';
+      return;
+    }
+    throw new Error('Files not shareable');
+  } catch (e) {
+    // Desktop / share cancelled / not allowed -> just download instead
+    // so Share never does nothing
+    if (e.name !== 'AbortError') await downloadPNG();
   }
-});
+}
 
-if (shareBtn) shareBtn.addEventListener('click', async () => {
-  const link = getShareLink();
-  if (navigator.share) {
-    try { await navigator.share({ title: 'My tattoo design', text: 'Check out my design', url: link }); return; }
-    catch(e) {}
-  }
-  try { await navigator.clipboard.writeText(link); } catch(e) {}
-  if (shareStatus) shareStatus.textContent = 'Link copied!';
-});
+if (downloadBtn) downloadBtn.addEventListener('click', downloadPNG);
+if (shareBtn) shareBtn.addEventListener('click', shareDesign);
 
 
-
-
-// ---------- Flip + Transparency (Undo lives in animation.js) ----------
+// Flip & Transparancy
 window.flipX = 1;
 const flipHBtn = document.getElementById('flipHBtn');
 const opacitySlider = document.getElementById('opacitySlider');
@@ -617,16 +550,9 @@ function applyFlip() {
   if (stencilEl) stencilEl.style.scale = `${window.flipX} 1`;
 }
 
-// Flip: animation.js saves state on its own saveState, but it can't see
-// this click, so we trigger its save by faking a slider change is messy.
-// Instead: just flip - animation.js will save the NEXT drag/slider change.
-// If you want Flip itself undoable, keep this one line: it pushes to
-// animation.js's stack via the reset button trick is not needed -
-// see note below.
-
 if (flipHBtn) {
   flipHBtn.addEventListener('click', () => {
-    if (window.saveStencilState) window.saveStencilState(); // save BEFORE
+    if (window.saveStencilState) window.saveStencilState();
     window.flipX = window.flipX === 1 ? -1 : 1;
     flipHBtn.classList.toggle('active', window.flipX === -1);
     applyFlip();
@@ -635,7 +561,7 @@ if (flipHBtn) {
 
 if (opacitySlider) {
   opacitySlider.addEventListener('pointerdown', () => {
-    if (window.saveStencilState) window.saveStencilState(); // save BEFORE drag
+    if (window.saveStencilState) window.saveStencilState();
   });
   opacitySlider.addEventListener('input', () => {
     const v = Number(opacitySlider.value);
