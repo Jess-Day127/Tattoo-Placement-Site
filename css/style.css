@@ -566,52 +566,51 @@ nav {
 }
 
 /* ---------- Center: Fixed Area, Whole Image Always Visible ---------- */
-
-.try-on-container {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    height: 100%;
-    min-height: 0;
-}
-
-.try-on-container > h2 {
-    display: none;
-}
-
 .try-on-area {
-    width: 100%;
-    height: 100%;
-    flex: 1;
-    min-height: 0;
-    position: relative;
-    border: 3px dashed #111;
-    border-radius: 4px;
-    background: #fff;
-    overflow: hidden;
-    touch-action: none;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  border: 3px dashed #111;
+  border-radius: 4px;
+  background: #fff;
+  overflow: visible;
+  touch-action: none;
 }
 
-/* The fix: take the image OUT of flex layout, pin it to the box,
-   and let max-width / max-height do the fitting. */
+.body-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+/* SAME rules for both - this is what keeps them lined up + the old size */
+#imgBodyArea,
+#imgPainOverlay {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: calc(100% - 16px);
+  max-height: calc(100% - 16px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
 #imgBodyArea {
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    max-width: calc(100% - 16px);
-    max-height: calc(100% - 16px);
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
+  display: block;
 }
 
-#imgBodyArea:not([src]),
-#imgBodyArea[src=""] {
-    display: none;
+#imgPainOverlay {
+  pointer-events: none;
+  opacity: 0.90;
+  mix-blend-mode: normal;
+  display: none;
 }
 
-
+#imgPainOverlay.visible {
+  display: block;
+}
 /* ---------- Stencil ---------- */
 
 .try-on-area {

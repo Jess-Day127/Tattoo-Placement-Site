@@ -240,6 +240,93 @@ const bodyImages = {
     }
 };
 
+const painImages = {
+    torso: {
+        1: './assets/Body Areas/Pain/torso 1.png',
+        2: './assets/Body Areas/Pain/torso 2.png',
+        3: './assets/Body Areas/Pain/torso 3.png'
+    },
+
+    back: {
+        1: './assets/Body Areas/Pain/back 1.png',
+        2: './assets/Body Areas/Pain/back 2.png',
+        3: './assets/Body Areas/Pain/back 3.png'
+    },
+
+    ribs: {
+        1: './assets/Body Areas/Pain/rib 1.png',
+        2: './assets/Body Areas/Pain/rib 2.png',
+        3: './assets/Body Areas/Pain/rib 3.png'
+    },
+
+    head: {
+        1: './assets/Body Areas/Pain/head.png'
+    },
+
+    throat: {
+        1: './assets/Body Areas/Pain/throat.png'
+    },
+
+    ear: {
+        1: './assets/Body Areas/Pain/ear.png'
+    },
+
+    knuckles: {
+        1: './assets/Body Areas/Pain/knuckles.png'
+    },
+
+    armInside: {
+        1: './assets/Body Areas/Pain/arm in 1.png',
+        2: './assets/Body Areas/Pain/arm in 2.png',
+        3: './assets/Body Areas/Pain/arm in 3.png'
+    },
+
+    armOutside: {
+        1: './assets/Body Areas/Pain/arm out 1.png',
+        2: './assets/Body Areas/Pain/arm out 2.png',
+        3: './assets/Body Areas/Pain/arm out 3.png'
+    },
+
+    legBack: {
+        1: './assets/Body Areas/Pain/leg back 1.png',
+        2: './assets/Body Areas/Pain/leg back 2.png',
+        3: './assets/Body Areas/Pain/leg back 3.png'
+    },
+
+    legFront: {
+        1: './assets/Body Areas/Pain/leg front 1.png',
+        2: './assets/Body Areas/Pain/leg front 2.png',
+        3: './assets/Body Areas/Pain/leg front 3.png'
+    },
+
+    legSide: {
+        1: './assets/Body Areas/Pain/leg side 1.png',
+        2: './assets/Body Areas/Pain/leg side 2.png',
+        3: './assets/Body Areas/Pain/leg side 3.png'
+    },
+
+    hip: {
+        1: './assets/Body Areas/Pain/hip 1.png',
+        2: './assets/Body Areas/Pain/hip 2.png',
+        3: './assets/Body Areas/Pain/hip 3.png'
+    }
+};
+
+let painVisible = false;
+
+function updatePainOverlay() {
+  const overlay = document.getElementById('imgPainOverlay');
+  if (!overlay) return;
+  const areaPain = painImages[currentArea];
+  const src = areaPain ? (areaPain[currentBodyType] || areaPain['1']) : null;
+  if (src) {
+    overlay.src = src;
+  } else {
+    overlay.removeAttribute('src');
+  }
+  overlay.classList.toggle('visible', painVisible && !!src);
+}
+
 let currentArea = 'head'; // default
 let currentBodyType = '1';
 let currentSkinTone = 'greyscale'; // default
@@ -273,6 +360,7 @@ function updateImage() {
   if (!typeData) return;
   const newSrc = typeData[currentSkinTone] ?? typeData.light ?? typeData.greyscale;
   img.src = newSrc;
+  updatePainOverlay();
   img.onload = () => { if (window.updateStencilMask) window.updateStencilMask(); };
   if (img.complete && window.updateStencilMask) window.updateStencilMask();
 }
@@ -517,5 +605,13 @@ if (opacitySlider) {
     const v = Number(opacitySlider.value);
     if (stencilEl) stencilEl.style.opacity = v / 100;
     if (opacityValue) opacityValue.textContent = v + '%';
+  });
+}
+
+const painToggle = document.getElementById('painToggle');
+if (painToggle) {
+  painToggle.addEventListener('change', () => {
+    painVisible = painToggle.checked;
+    updatePainOverlay();
   });
 }

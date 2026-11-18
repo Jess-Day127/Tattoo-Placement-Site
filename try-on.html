@@ -57,9 +57,11 @@
     </section>
 
     <section class="try-on-container">
-        <h2>Try On</h2>
         <div class="try-on-area">
-            <img id="imgBodyArea" alt="Body area">
+            <div class="body-wrap">
+                <img id="imgBodyArea" alt="Body area">
+                <img id="imgPainOverlay" alt="Pain map" aria-hidden="true">
+            </div>
 
             <div class="stencil-box" id="stencilBox">
                 <div id="stencilClip">
@@ -70,7 +72,6 @@
             </div>
         </div>
     </section>
-
 
     <section class="right-column">
         <div class="body-area-dropdown">
@@ -109,7 +110,11 @@
         </div>
 
         <div class="pain-overlay">
-
+            <h2>Pain Map</h2>
+            <label class="switch">
+                <input type="checkbox" id="painToggle">
+                <span class="slider round"></span>
+            </label>
         </div>
 
         <div class="export-tools">
