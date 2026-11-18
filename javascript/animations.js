@@ -74,7 +74,17 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   const rotateHandle = document.getElementById('rotateHandle');
   if (!stage || !box || !stencilImg || !resizeHandle || !rotateHandle) return; // skip on home + upload
 
+
   const saved = sessionStorage.getItem('stencil');
+  const hasStencil = !!saved;
+
+  // No design = no transform box, no controls
+  if (!hasStencil) {
+    box.style.display = 'none';
+    setTransformEnabled(false);
+    return; // don't create Draggables, don't call select()
+  }
+
   if (saved) stencilImg.src = saved;
 
   gsap.set(box, { xPercent: -50, yPercent: -50, transformOrigin: 'center center', scale: 1 });
@@ -263,6 +273,16 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     updateStencilMask();
   });
 
+    function setTransformEnabled(enabled) {
+    const ids = ['posX', 'posY', 'rotSlider', 'scaleSlider', 'opacitySlider', 'flipHBtn', 'undo-button', 'redo-button', 'resetStencilBtn'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !enabled;
+    });
+    // Also grey out the whole left column so it's obvious
+    document.querySelector('.left-column')?.classList.toggle('controls-disabled', !enabled);
+  }
+
   Draggable.create(box, {
     type: 'x,y',
     bounds: stage,
@@ -343,6 +363,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   window.saveStencilState = saveState;
   syncSliders();
   updateUndoButtons();
+  setTransformEnabled(true);
   select();
 })();
 

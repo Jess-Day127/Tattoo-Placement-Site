@@ -341,15 +341,46 @@ function changeSkinTone(tone) {
 }
 
 function changeBodyType(type) {
-    currentBodyType = type;
-    updateImage();
+  currentBodyType = type;
+  updateImage();
+  updateBodyTypeButtons();
 }
 
 function changeBodyArea(area) {
-    currentArea = area;
-    updateImage();
-    resetStencilPosition();
+  currentArea = area;
+  if (!bodyImages[currentArea]?.[currentBodyType]) {
+    currentBodyType = '1';
+  }
+  updateImage();
+  resetStencilPosition();
 }
+
+function updateBodyTypeButtons() {
+  const section = document.getElementById('bodyTypeSection') || document.querySelector('.body-type');
+  if (!section) return;
+
+  const variations = Object.keys(bodyImages[currentArea] || {});
+  const count = variations.length;
+
+  // Only 1 variation - hide the whole card, there's nothing to choose
+  if (count <= 1) {
+    section.style.display = 'none';
+    currentBodyType = '1';
+    return;
+  }
+
+  // 2+ variations - show card, hide/disable the buttons that don't exist
+  section.style.display = '';
+  const buttons = section.querySelectorAll('button');
+  buttons.forEach(btn => {
+    const type = btn.dataset.bodyType || btn.textContent.trim();
+    const exists = variations.includes(type);
+    btn.style.display = exists ? '' : 'none';
+    btn.disabled = !exists;
+    btn.classList.toggle('active', type === String(currentBodyType));
+  });
+}
+
 
 function updateImage() {
   const img = document.getElementById('imgBodyArea');
@@ -361,6 +392,7 @@ function updateImage() {
   const newSrc = typeData[currentSkinTone] ?? typeData.light ?? typeData.greyscale;
   img.src = newSrc;
   updatePainOverlay();
+  updateBodyTypeButtons();
   img.onload = () => { if (window.updateStencilMask) window.updateStencilMask(); };
   if (img.complete && window.updateStencilMask) window.updateStencilMask();
 }
@@ -380,7 +412,11 @@ function resetStencilPosition() {
 }
 
 function showStencil() {
-  if (!stencilBox || !stencilImg || !stencilImage) return;
+  if (!stencilBox) return;
+  if (!stencilImage) {
+    stencilBox.style.display = 'none';
+    return;
+  }
   stencilImg.src = stencilImage;
   stencilBox.style.display = 'block';
 }
