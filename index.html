@@ -19,55 +19,153 @@
         </ul>
     </nav>
 
-    <main>    
-        <section class="hero-section">
-            <div class="splat splat-left"><img src="./assets/Splat.png" alt=""></div>
-            <div class="splat splat-right"><img src="./assets/Splat.png" alt=""></div>
-            <div class="hero">
-                <h2>Welcome to</h2>
-                <h1>X Mark's the Spot</h1>
-                <p>Try on your tattoo before you get it inked forever. Upload your own design or choose from available flash.</p>
-                <button type="button" onclick="window.location.href='./upload.html'">Upload Design</button>
-            </div>
-        </section>
+<main>
+    <div class="slides-wrapper">
 
-        <section class="features-section">
-            <h2>Features</h2>
-            <div class="features">
-                <div class="feature">
-                    <h3>No AI generated Designs</h3>
-                    <p>This site does not support AI-generated designs.</p>
+        <!-- SECTION 1 - HERO -->
+        <section class="section section-1">
+            <div class="section-content">
+                <div class="section-inner">
+                <div class="splat splat-left"><img src="./assets/Splat.png" alt=""></div>
+                <div class="splat splat-right"><img src="./assets/Splat.png" alt=""></div>
+                <div class="hero">
+                    <h2>Welcome to</h2>
+                    <h1>X Mark's the Spot</h1>
+                    <p>Try on your tattoo before you get it inked forever. Upload your own design or choose from available flash.</p>
+                    <button type="button" onclick="window.location.href='./upload.html'">Upload Design</button>
                 </div>
-                <div class="feature">
-                    <h3>Change Skin Tone</h3>
-                    <p>Adjust the skin tone of the model to see how your tattoo will look on different skin types.</p>
-                </div>
-                <div class="feature">
-                    <h3>Background Removal</h3>
-                    <p>Remove the background from your tattoo design for a more realistic preview.</p>
-                </div>
-                <div class="feature">
-                    <h3>No Pesky Sign-Up's</h3>
-                    <p>Enjoy our services without the hassle of creating an account.</p>
-                </div>
-                <div class="feature">
-                    <h3>Pain Chart</h3>
-                    <p>Pain based on location of tattoo.</p>
                 </div>
             </div>
         </section>
 
-        <section class="hiw-section">
-            <div class="how-it-works">
-                <h2>How it works</h2>
-                <p>Step 1: Upload your design or Choose from Available Flash</p>
-                <p>Step 2: Automatically remove the background with Poof API</p>
-                <p>Step 3: Try-on virtually</p>
-                <p>Step 4: Get the tattoo!</p>
+        <!-- SECTION 2 - FEATURES - this is the long scrollable one -->
+        <section class="section section-2">
+            <div class="section-content">
+                <div class="section-inner">
+                <div class="features-head">
+                    <div class="ticker">TRY IT BEFORE YOU INK IT &nbsp;•&nbsp; REAL ARTISTS &nbsp;•&nbsp; NO AI &nbsp;•&nbsp; NO SIGN-UP &nbsp;•&nbsp;</div>
+                    <h2>Features</h2>
+                    <p class="features-sub">Preview it properly before it's permanent.</p>
+                </div>
+                <div class="features">
+                    <div class="feature"><h3>No AI generated Designs</h3><p>This site does not support AI-generated designs.</p></div>
+                    <div class="feature"><h3>Change Skin Tone</h3><p>Adjust the skin tone of the model to see how your tattoo will look on different skin types.</p></div>
+                    <div class="feature"><h3>Background Removal</h3><p>Remove the background from your tattoo design for a more realistic preview.</p></div>
+                    <div class="feature"><h3>No Pesky Sign-Up's</h3><p>Enjoy our services without the hassle of creating an account.</p></div>
+                    <div class="feature"><h3>Pain Chart</h3><p>Pain based on location of tattoo.</p></div>
+                </div>
+                </div>
             </div>
         </section>
 
-    </main>
+        <!-- SECTION 3 - HOW IT WORKS - NEW: Visual journey, not cards -->
+        <section class="section section-3">
+            <div class="section-content">
+                <div class="section-inner">
+                <div class="hiw-layout">
+
+                    <!-- Left: the visual - what it actually looks like -->
+                    <div class="hiw-visual">
+                    <div class="hiw-phone">
+                        <div class="hiw-phone-top">X MARKS THE SPOT</div>
+                        <div class="hiw-phone-body">
+                        <p class="hiw-phone-label">YOUR DESIGN</p>
+                        <div class="hiw-mock">✕</div>
+                        <p class="hiw-phone-caption">Snake & Rose<br><span>Placed • Sized • Faded to skin</span></p>
+                        </div>
+                        <div class="hiw-phone-bottom">
+                        <span>◀ &nbsp; TRY IT ON</span>
+                        <span>✓ &nbsp; DONE</span>
+                        </div>
+                    </div>
+                    <p class="hiw-visual-note">← This is the preview. Not the tattoo.</p>
+                    </div>
+
+                    <!-- Right: the timeline -->
+                    <div class="hiw-timeline">
+                    <p class="eyebrow">HOW IT WORKS</p>
+                    <h2>From idea to<br>“yeah, that’s the one.”</h2>
+
+                    <div class="hiw-step">
+                        <div class="hiw-num">1</div>
+                        <div>
+                        <h3>Upload or pick flash</h3>
+                        <p>Drop your own design, or pick one from the flash wall. No account needed.</p>
+                        <span class="hiw-time">30 seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="hiw-step">
+                        <div class="hiw-num">2</div>
+                        <div>
+                        <h3>We cut the background out</h3>
+                        <p>Poof API removes the white box around your design so it sits like real ink.</p>
+                        <span class="hiw-time">Automatic</span>
+                        </div>
+                    </div>
+
+                    <div class="hiw-step">
+                        <div class="hiw-num">3</div>
+                        <div>
+                        <h3>Try it on your skin</h3>
+                        <p>Drag, rotate, resize, fade it. Change skin tone, check the pain map.</p>
+                        <span class="hiw-time">Play around</span>
+                        </div>
+                    </div>
+
+                    <div class="hiw-step">
+                        <div class="hiw-num">4</div>
+                        <div>
+                        <h3>Show your artist</h3>
+                        <p>Screenshot it and take it to your artist. No more “I think it goes here?”</p>
+                        <span class="hiw-time">Book it</span>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5 - FAQ + FINAL CTA -->
+        <section class="section section-5">
+            <div class="section-content">
+                <div class="section-inner">
+                <div class="faq-wrap">
+                    <div class="faq-left">
+                    <p class="eyebrow">GOOD TO KNOW</p>
+                    <h2>Before you get inked</h2>
+                    <p class="faq-sub">The 3 things everyone asks us. Short answers, no fluff.</p>
+                    <button type="button" class="big-cta" onclick="window.location.href='./upload.html'">Upload Design →</button>
+                    <p class="cta-note">Free • No sign-up • 1 minute</p>
+                    </div>
+
+                    <div class="faq-right">
+                    <details open>
+                        <summary>Is this 100% accurate?</summary>
+                        <p>No - it's a preview. Skin tone, body curve, and artist style will change it. Use it to check placement, size, and vibe, not as a final stencil.</p>
+                    </details>
+                    <details>
+                        <summary>Do I need an account?</summary>
+                        <p>No. Upload, remove the background, try it on, done. Nothing is saved unless you save it yourself.</p>
+                    </details>
+                    <details>
+                        <summary>Does it use AI to design tattoos?</summary>
+                        <p>No. We don't generate designs. You bring real art - yours or real flash from artists.</p>
+                    </details>
+                    <details>
+                        <summary>What about pain?</summary>
+                        <p>Use the Pain Chart in Try-On. Bony / thin-skin spots hurt more - ribs, feet, inner arm. Fleshy spots like outer arm / thigh are easier for a first tattoo.</p>
+                    </details>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
 
     <footer>
         <p>This is a virtual preview. Results may vary.</p>
@@ -79,6 +177,8 @@
     <script src="./javascript/GSAP Plug-in's/Flip.min.js" defer></script>
     <script src="./javascript/GSAP Plug-in's/Draggable.min.js" defer></script>
     <script src="./javascript/GSAP Plug-in's/ScrollTrigger.min.js" defer></script>
+
+    <script src="./javascript/animations.js" defer></script>
 
 </body>
 </html>

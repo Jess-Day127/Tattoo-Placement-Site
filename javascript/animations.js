@@ -145,21 +145,19 @@ window.setTransformEnabled = setTransformEnabled;
   }
 
   function updateStencilMask() {
-    const bodyImg = document.getElementById('imgBodyArea');
-    const clip = document.getElementById('stencilClip');
-    if (!bodyImg || !clip || !box) return;
-    const bodyRect = bodyImg.getBoundingClientRect();
-    const boxRect = box.getBoundingClientRect();
-    const maskUrl = `url("${bodyImg.src}")`;
-    clip.style.webkitMaskImage = maskUrl;
-    clip.style.maskImage = maskUrl;
-    clip.style.webkitMaskSize = `${bodyRect.width}px ${bodyRect.height}px`;
-    clip.style.maskSize = `${bodyRect.width}px ${bodyRect.height}px`;
-    clip.style.webkitMaskPosition = `${bodyRect.left - boxRect.left}px ${bodyRect.top - boxRect.top}px`;
-    clip.style.maskPosition = `${bodyRect.left - boxRect.left}px ${bodyRect.top - boxRect.top}px`;
-  }
-  window.updateStencilMask = updateStencilMask;
-  window.addEventListener('resize', updateStencilMask);
+  const bodyImg = document.getElementById('imgBodyArea');
+  const clip = document.getElementById('stencilClip');
+  if (!bodyImg || !clip || !box) return;
+  const bodyRect = bodyImg.getBoundingClientRect();
+  const boxRect = box.getBoundingClientRect();
+  clip.style.webkitMaskImage = `url("${bodyImg.src}")`;
+  clip.style.maskImage = `url("${bodyImg.src}")`;
+  clip.style.webkitMaskSize = `${bodyRect.width}px ${bodyRect.height}px`;
+  clip.style.maskSize = `${bodyRect.width}px ${bodyRect.height}px`;
+  clip.style.webkitMaskPosition = `${bodyRect.left - boxRect.left}px ${bodyRect.top - boxRect.top}px`;
+  clip.style.maskPosition = `${bodyRect.left - boxRect.left}px ${bodyRect.top - boxRect.top}px`;
+}
+  
 
   function select() {
     box.classList.add('selected');
@@ -195,7 +193,7 @@ window.setTransformEnabled = setTransformEnabled;
     return {
       x: gsap.getProperty(box, 'x'),
       y: gsap.getProperty(box, 'y'),
-      rotation: gsap.getProperty(box, 'rotation'),
+      rotation: gsap.getProperty(stencilImg, 'rotation'),
       width: box.offsetWidth,
       flipX: window.flipX ?? 1,
       opacity: stencilImg ? Number(stencilImg.style.opacity || 1) : 1,
@@ -204,10 +202,10 @@ window.setTransformEnabled = setTransformEnabled;
 
   function applyState(s) {
     isApplying = true;
-    gsap.set(box, { x: s.x, y: s.y, rotation: s.rotation, width: s.width, scale: 1 });
+    gsap.set(box, { x: s.x, y: s.y, width: s.width, scale: 1 });
+    gsap.set(stencilImg, { rotation: s.rotation, scaleX: s.flipX ?? 1 });
     window.flipX = s.flipX ?? 1;
     if (stencilImg) {
-      stencilImg.style.scale = `${window.flipX} 1`;
       stencilImg.style.opacity = s.opacity ?? 1;
     }
     const opSlider = document.getElementById('opacitySlider');
@@ -252,7 +250,7 @@ window.setTransformEnabled = setTransformEnabled;
 
   bindSlider(posX, v => { gsap.set(box, { x: v }); clampToStage(); updateStencilMask(); });
   bindSlider(posY, v => { gsap.set(box, { y: v }); clampToStage(); updateStencilMask(); });
-  bindSlider(rotSlider, v => { gsap.set(box, { rotation: v }); clampToStage(); updateStencilMask(); });
+  bindSlider(rotSlider, v => { gsap.set(stencilImg, { rotation: v }); updateStencilMask(); });
   bindSlider(scaleSlider, v => { gsap.set(box, { width: v, scale: 1 }); clampToStage(); updateStencilMask(); });
 
   if (undoBtn) undoBtn.addEventListener('click', () => {
@@ -271,7 +269,8 @@ window.setTransformEnabled = setTransformEnabled;
 
   if (resetBtn) resetBtn.addEventListener('click', () => {
     saveState();
-    gsap.set(box, { x: 0, y: 0, xPercent: -50, yPercent: -50, rotation: 0, scale: 1, width: 220 });
+    gsap.set(box, { x: 0, y: 0, xPercent: -50, yPercent: -50, scale: 1, width: 220 });
+    gsap.set(stencilImg, { rotation: 0 });
     syncSliders();
     updateStencilMask();
   });
@@ -342,7 +341,7 @@ window.setTransformEnabled = setTransformEnabled;
         e.clientY - stageRect.top - cy,
         e.clientX - stageRect.left - cx
       );
-      startRotation = gsap.getProperty(box, 'rotation');
+      startRotation = gsap.getProperty(stencilImg, 'rotation');
     },
     onDrag(e) {
       const { cx, cy, stageRect } = boxCentre();
@@ -351,7 +350,7 @@ window.setTransformEnabled = setTransformEnabled;
         e.clientX - stageRect.left - cx
       );
       const delta = (now - startAngle) * 180 / Math.PI;
-      gsap.set(box, { rotation: startRotation + delta });
+      gsap.set(stencilImg, { rotation: startRotation + delta });
       gsap.set(rotateHandle, { x: 0, y: 0 });
       syncSliders();
       updateStencilMask();
@@ -401,3 +400,51 @@ window.setTransformEnabled = setTransformEnabled;
 
   window.wipe = wipe;
 })();
+
+
+gsap.registerPlugin(ScrollTrigger);
+
+const panels = gsap.utils.toArray(".section");
+panels.pop(); // don't pin the last one (How it works) so footer shows
+
+panels.forEach((panel) => {
+  const inner = panel.querySelector(".section-inner");
+  if (!inner) return;
+
+  const panelHeight = inner.offsetHeight;
+  const windowHeight = window.innerHeight;
+  const difference = panelHeight - windowHeight;
+
+  // ratio for fake-scrolling if panel is taller than window (Features)
+  const fakeScrollRatio = difference > 0 ? (difference / (difference + windowHeight)) : 0;
+
+  if (fakeScrollRatio) {
+    panel.style.marginBottom = panelHeight * fakeScrollRatio + "px";
+  }
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: panel,
+      start: "bottom bottom",
+      end: () => fakeScrollRatio ? `+=${inner.offsetHeight}` : "bottom top",
+      pinSpacing: false,
+      pin: true,
+      scrub: true,
+      invalidateOnRefresh: true
+    }
+  });
+
+  if (fakeScrollRatio) {
+    tl.to(inner, {
+      yPercent: -100,
+      y: windowHeight,
+      duration: 1 / (1 - fakeScrollRatio) - 1,
+      ease: "none"
+    });
+  }
+
+  tl.fromTo(panel, { scale: 1, opacity: 1 }, { scale: 0.7, opacity: 0.5, duration: 0.9 })
+    .to(panel, { opacity: 0, duration: 0.1 });
+});
+
+window.addEventListener("load", () => ScrollTrigger.refresh());
