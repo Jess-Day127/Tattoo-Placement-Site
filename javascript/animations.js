@@ -92,6 +92,35 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     };
   }
 
+  function updateSliderLimits() {
+    if (!posX || !posY) return;
+    const stageRect = stage.getBoundingClientRect();
+    const boxRect = box.getBoundingClientRect();
+    // How far can the centre move before an edge hits?
+    const maxX = Math.max(0, (stageRect.width - boxRect.width) / 2);
+    const maxY = Math.max(0, (stageRect.height - boxRect.height) / 2);
+    posX.min = -maxX;
+    posX.max = maxX;
+    posY.min = -maxY;
+    posY.max = maxY;
+    // Scale can't be bigger than the stage itself
+    if (scaleSlider) {
+      scaleSlider.max = Math.floor(Math.min(stageRect.width, stageRect.height));
+    }
+  }
+
+  function clampToStage() {
+    const stageRect = stage.getBoundingClientRect();
+    const boxRect = box.getBoundingClientRect();
+    const maxX = Math.max(0, (stageRect.width - boxRect.width) / 2);
+    const maxY = Math.max(0, (stageRect.height - boxRect.height) / 2);
+    let x = gsap.getProperty(box, 'x');
+    let y = gsap.getProperty(box, 'y');
+    x = Math.max(-maxX, Math.min(maxX, x));
+    y = Math.max(-maxY, Math.min(maxY, y));
+    gsap.set(box, { x, y });
+  }
+
   function updateStencilMask() {
     const bodyImg = document.getElementById('imgBodyArea');
     const clip = document.getElementById('stencilClip');
@@ -183,6 +212,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   }
 
   function syncSliders() {
+    updateSliderLimits();
     const s = getState();
     if (posX) posX.value = s.x;
     if (posY) posY.value = s.y;
@@ -192,14 +222,15 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
 
   function bindSlider(el, fn) {
     if (!el) return;
+    el.addEventListener('pointerdown', () => saveState()); // before
     el.addEventListener('input', () => { fn(parseFloat(el.value)); syncSliders(); });
-    el.addEventListener('change', () => saveState());
+    // delete the 'change' saveState
   }
 
-  bindSlider(posX, v => gsap.set(box, { x: v }));
-  bindSlider(posY, v => gsap.set(box, { y: v }));
-  bindSlider(rotSlider, v => gsap.set(box, { rotation: v }));
-  bindSlider(scaleSlider, v => gsap.set(box, { width: v, scale: 1 }));
+  bindSlider(posX, v => { gsap.set(box, { x: v }); clampToStage(); updateStencilMask(); });
+  bindSlider(posY, v => { gsap.set(box, { y: v }); clampToStage(); updateStencilMask(); });
+  bindSlider(rotSlider, v => { gsap.set(box, { rotation: v }); clampToStage(); updateStencilMask(); });
+  bindSlider(scaleSlider, v => { gsap.set(box, { width: v, scale: 1 }); clampToStage(); updateStencilMask(); });
 
   if (undoBtn) undoBtn.addEventListener('click', () => {
     if (!undoStack.length) return;
@@ -219,10 +250,13 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     saveState();
     gsap.set(box, { x: 0, y: 0, xPercent: -50, yPercent: -50, rotation: 0, scale: 1, width: 220 });
     syncSliders();
+    updateStencilMask();
   });
 
-    Draggable.create(box, {
+  Draggable.create(box, {
     type: 'x,y',
+    bounds: stage,
+    edgeResistance: 0.8,
     onPress() { select(); },
     onDrag() { syncSliders(); updateStencilMask(); },
     onRelease() { saveState(); syncSliders(); updateStencilMask(); }
@@ -248,9 +282,11 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
         e.clientX - stageRect.left - cx,
         e.clientY - stageRect.top - cy
       );
-      const newWidth = Math.max(40, startWidth * (dist / startDist));
+      const maxSize = Math.min(stageRect.width, stageRect.height);
+      const newWidth = Math.max(40, Math.min(maxSize, startWidth * (dist / startDist)));
       gsap.set(box, { width: newWidth, scale: 1 });
       gsap.set(resizeHandle, { x: 0, y: 0 });
+      clampToStage();
       syncSliders();
       updateStencilMask();
     },
@@ -295,6 +331,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     }
   });
   saveState();
+  window.saveStencilState = saveState;
   syncSliders();
   updateUndoButtons();
   select();

@@ -240,7 +240,7 @@ const bodyImages = {
     }
 };
 
-let currentArea = 'torso'; // default
+let currentArea = 'head'; // default
 let currentBodyType = '1';
 let currentSkinTone = 'greyscale'; // default
 
@@ -302,13 +302,6 @@ if (document.getElementById('imgBodyArea')) {
   showStencil();
 }
 
-const resetStencilBtn = document.getElementById('resetStencilBtn');
-if (resetStencilBtn) {
-  resetStencilBtn.addEventListener('click', () => {
-    resetStencilPosition();
-  });
-}
-
 // Export & Share
 const downloadBtn = document.getElementById('downloadBtn');
 const copyLinkBtn = document.getElementById('copyLinkBtn');
@@ -326,23 +319,16 @@ function getStencilImg() {
 }
 
 function getDesignState() {
-  // Don't use variable names - read from DOM / sessionStorage
-  // This way it can't throw "is not defined"
-  const bodyImg = getBodyImg();
-  const skinBtn = document.querySelector('[data-skin].active, [data-skin-tone].active');
-  const bodyBtn = document.querySelector('[data-body-type].active, [data-body].active');
-  const areaBtn = document.querySelector('[data-body-area].active, [data-area].active');
-
+  const stencilElNow = document.getElementById('imgStencil');
   return {
-    // Use the image src / data attribute if you have it, otherwise fallback
-    skin: skinBtn ? (skinBtn.dataset.skin || skinBtn.dataset.skinTone) : (window.currentSkinTone || sessionStorage.getItem('skinTone') || 'light'),
-    body: bodyBtn ? (bodyBtn.dataset.bodyType || bodyBtn.dataset.body) : (window.currentBodyType || sessionStorage.getItem('bodyType') || 'slim'),
-    area: areaBtn ? (areaBtn.dataset.bodyArea || areaBtn.dataset.area) : (window.currentBodyArea || sessionStorage.getItem('bodyArea') || 'forearm'),
-    bodySrc: bodyImg ? bodyImg.src : '',
-    stencil: sessionStorage.getItem('stencilName') || 'custom',
-    x: typeof gsap !== 'undefined' && stencilBox ? gsap.getProperty(stencilBox, 'x') : 0,
-    y: typeof gsap !== 'undefined' && stencilBox ? gsap.getProperty(stencilBox, 'y') : 0,
-    rotation: typeof gsap !== 'undefined' && stencilBox ? gsap.getProperty(stencilBox, 'rotation') : 0,
+    skin: currentSkinTone,
+    body: currentBodyType,
+    area: currentArea,
+    flipX: window.flipX ?? 1,
+    opacity: stencilElNow ? Number(stencilElNow.style.opacity || 1) : 1,
+    x: stencilBox ? gsap.getProperty(stencilBox, 'x') : 0,
+    y: stencilBox ? gsap.getProperty(stencilBox, 'y') : 0,
+    rotation: stencilBox ? gsap.getProperty(stencilBox, 'rotation') : 0,
     width: stencilBox ? stencilBox.offsetWidth : 220,
   };
 }
@@ -358,19 +344,44 @@ function loadFromLink() {
   if (!hash.startsWith('#design=')) return;
   try {
     const state = JSON.parse(atob(hash.replace('#design=', '')));
-    // Don't call updateImage() with undefined vars - just set the stencil transform
-    // Your existing changeBodyType / changeBodyArea functions will handle body
+
+    // 1. Restore body FIRST, on their own lines - not inside gsap.set
+    if (state.area) currentArea = state.area;
+    if (state.skin) currentSkinTone = state.skin;
+    if (state.body) currentBodyType = state.body;
+    updateImage();
+
+    // 2. Restore flip + opacity
+    if (state.flipX) {
+      window.flipX = state.flipX;
+      const img = document.getElementById('imgStencil');
+      if (img) img.style.scale = `${window.flipX} 1`;
+      const flipBtn = document.getElementById('flipHBtn');
+      if (flipBtn) flipBtn.classList.toggle('active', window.flipX === -1);
+    }
+    if (state.opacity != null) {
+      const img = document.getElementById('imgStencil');
+      if (img) img.style.opacity = state.opacity;
+      const opSlider = document.getElementById('opacitySlider');
+      const opVal = document.getElementById('opacityValue');
+      if (opSlider) opSlider.value = Math.round(state.opacity * 100);
+      if (opVal) opVal.textContent = Math.round(state.opacity * 100) + '%';
+    }
+
+    // 3. Restore position LAST, as a plain object
     if (stencilBox) {
       gsap.set(stencilBox, {
-        x: state.x || 0, y: state.y || 0,
+        x: state.x || 0,
+        y: state.y || 0,
         rotation: state.rotation || 0,
-        width: state.width || 220, scale: 1
+        width: state.width || 220,
+        scale: 1
       });
     }
+
+    if (window.updateStencilMask) window.updateStencilMask();
   } catch(e) { console.log('Bad share link', e); }
 }
-
-loadFromLink();
 
 async function downloadPNG() {
   const bodyImg = getBodyImg();
@@ -403,10 +414,12 @@ async function downloadPNG() {
   sCtx.save();
   sCtx.translate(cx, cy);
   sCtx.rotate(rot);
-  sCtx.scale(flipX, 1);
-  sCtx.globalAlpha = imgStencilEl ? Number(imgStencilEl.style.opacity || 1) : 1;
+  sCtx.scale(window.flipX ?? 1, 1);
+  sCtx.globalAlpha = stencilEl ? Number(stencilEl.style.opacity || 1) : 1;
   sCtx.drawImage(stencil, -w/2, -h/2, w, h);
   sCtx.restore();
+
+  
 
   // 2. Build a mask from the body image
   // Corner pixel = background colour (the gap / outside the body)
@@ -486,8 +499,10 @@ function applyFlip() {
 // If you want Flip itself undoable, keep this one line: it pushes to
 // animation.js's stack via the reset button trick is not needed -
 // see note below.
+
 if (flipHBtn) {
   flipHBtn.addEventListener('click', () => {
+    if (window.saveStencilState) window.saveStencilState(); // save BEFORE
     window.flipX = window.flipX === 1 ? -1 : 1;
     flipHBtn.classList.toggle('active', window.flipX === -1);
     applyFlip();
@@ -495,6 +510,9 @@ if (flipHBtn) {
 }
 
 if (opacitySlider) {
+  opacitySlider.addEventListener('pointerdown', () => {
+    if (window.saveStencilState) window.saveStencilState(); // save BEFORE drag
+  });
   opacitySlider.addEventListener('input', () => {
     const v = Number(opacitySlider.value);
     if (stencilEl) stencilEl.style.opacity = v / 100;
