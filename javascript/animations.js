@@ -288,9 +288,8 @@ window.setTransformEnabled = setTransformEnabled;
   // Order matters: create box first, then handles.
 
   function positionHandles() {
-    const w = box.offsetWidth;
-    gsap.set(resizeHandle, { x: 0, y: 0, left: w - 10, top: w - 10 });
-    gsap.set(rotateHandle, { x: 0, y: 0, left: w / 2 - 10, top: -40 });
+    // Resize handle ONLY - rotate is now CSS-centered, don't touch it
+    gsap.set(resizeHandle, { x: 0, y: 0, left: box.offsetWidth - 8, top: box.offsetHeight - 8 });
   }
 
 
@@ -327,7 +326,6 @@ window.setTransformEnabled = setTransformEnabled;
       gsap.set(box, { width: newWidth, scale: 1 });
       // Move BOTH handles - resize to corner, rotate to new centre
       gsap.set(resizeHandle, { left: newWidth - 16, top: newWidth - 16 });
-      gsap.set(rotateHandle, { left: newWidth / 2 - 16, top: -40 });
       clampToStage();
       syncSliders();
       updateStencilMask();
@@ -375,7 +373,7 @@ window.setTransformEnabled = setTransformEnabled;
     syncSliders();
     updateStencilMask();
   }
-    stage.addEventListener('pointerup', endRotate);
+  stage.addEventListener('pointerup', endRotate);
   stage.addEventListener('pointercancel', endRotate);
 
   // These lines were missing too - they set up the handles + undo
