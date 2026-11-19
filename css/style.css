@@ -1793,10 +1793,13 @@ input:checked + .pain-toggle:before {
     }
 }
 
+
 /* ============================================================
-   UPLOAD FIX - PASTE AT VERY BOTTOM, DELETE NOTHING ELSE
-   Matches: main.upload-page > .upload-section + .flash-wall
+   UPLOAD - CLEAN, FINAL
+   Upload LEFT, Flash RIGHT, pinned wipe
    ============================================================ */
+
+
 
 main.upload-page {
     display: grid !important;
@@ -1808,14 +1811,13 @@ main.upload-page {
     margin-top: 56px !important;
     padding: 32px 48px !important;
     box-sizing: border-box !important;
-    background-color: #2f4a5e !important;
+    background-color: var(--slate) !important;
     background-image: url("../assets/upload-pg-bg.png") !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
 }
 
-/* FORCE same row - this kills the diagonal */
 main.upload-page > .upload-section {
     grid-column: 1 !important;
     grid-row: 1 !important;
@@ -1843,6 +1845,20 @@ main.upload-page .gallery {
     aspect-ratio: 4 / 3 !important;
     grid-template-columns: repeat(4, 1fr) !important;
     grid-template-rows: repeat(3, 1fr) !important;
+}
+
+/* Fix: afterLayer must be block, not flex, or afterImg disappears */
+main.upload-page #afterLayer {
+    display: block !important;
+}
+
+main.upload-page #afterImg {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
 }
 
 @media (max-width: 1000px) {
@@ -1879,11 +1895,21 @@ main.upload-page .gallery {
     }
 }
 
+/* No page scroll on upload - only the wipe moves */
+html:has(main.upload-page),
+body:has(main.upload-page) {
+    overflow: hidden !important;
+    height: 100% !important;
+}
 
-
-/* Pin handles the scroll distance now, no extra height needed */
 main.upload-page {
-    min-height: calc(100vh - 56px) !important;
-    align-items: start !important;
-    align-content: start !important;
+    height: calc(100vh - 56px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin-top: 56px !important;
+}
+
+/* Footer sits below, not visible until you leave / Try On - hide it on upload */
+body:has(main.upload-page) footer {
+    display: none !important;
 }

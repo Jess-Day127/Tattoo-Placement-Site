@@ -369,38 +369,56 @@ window.setTransformEnabled = setTransformEnabled;
 })();
 
 
-// Stencil Before -> After Scroll - WORKS AGAIN
+// Before/After - wheel drives ONLY the wipe, page NEVER moves
 (() => {
   const afterLayer = document.getElementById('afterLayer');
   const afterImg = document.getElementById('afterImg');
   if (!afterLayer || !afterImg) return;
 
-  // Start hidden off to the right
-  gsap.set(afterLayer, { xPercent: 100 });
-  gsap.set(afterImg, { xPercent: -100 });
+  gsap.set(afterLayer, { clearProps: 'transform,xPercent,x' });
+  gsap.set(afterImg, { clearProps: 'transform,xPercent,x' });
 
-  // 800px of scroll to scrub through, like the working version
-  // trigger = whole page, NOT drop-area, so it doesn't run out
-  // pin: false = won't break the grid
-  // enabled: false = won't run until you convert
-  const wipe = gsap.timeline({
+  let target = 0;   // where the wheel wants to go
+  let current = 0;  // where we actually are - eased toward target
+  let enabled = false;
+
+  // Reveal from RIGHT -> LEFT (same as your original working wipe)
+  // left-inset shrinks, so checkerboard grows in from the right edge
+  function render() {
+    current += (target - current) * 0.12; // smoothing - this is the scrub
+    if (Math.abs(target - current) < 0.001) current = target;
+    afterLayer.style.clipPath = `inset(0% 0% 0% ${(1 - current) * 100}%)`;
+  }
+  gsap.ticker.add(render);
+
+  function setWipe(p) {
+    target = Math.max(0, Math.min(1, p));
+    if (!enabled) { current = target; render(); }
+  }
+
+  window.addEventListener('wheel', (e) => {
+    if (!enabled) return;
+    e.preventDefault();
+    setWipe(target + e.deltaY / 800);
+  }, { passive: false });
+
+  let lastY = 0;
+  window.addEventListener('touchstart', (e) => { lastY = e.touches[0].clientY; }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (!enabled) return;
+    e.preventDefault();
+    const y = e.touches[0].clientY;
+    setWipe(target + (lastY - y) / 400);
+    lastY = y;
+  }, { passive: false });
+
+  window.wipe = {
     scrollTrigger: {
-      trigger: 'main.upload-page',
-      start: 'top top',
-      end: '+=800',
-      scrub: 1,
-      pin: true,
-      enabled: false,
-      invalidateOnRefresh: true,
-    },
-    defaults: { ease: 'none' }
-  });
-
-  wipe
-    .to(afterLayer, { xPercent: 0 }, 0)
-    .to(afterImg, { xPercent: 0 }, 0);
-
-  window.wipe = wipe;
+      enable: () => { enabled = true; target = 0; current = 0; render(); },
+      disable: () => { enabled = false; target = 0; current = 0; render(); },
+    }
+  };
+  window.setCompareWipe = setWipe;
 })();
 
 
