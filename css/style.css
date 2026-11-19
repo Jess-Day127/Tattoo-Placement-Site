@@ -564,7 +564,7 @@ scary movie reference...*/
     margin: 14px 0 24px;
 }
 
-.big-cta {
+.big-cta, .hero button {
     font-family: "TanJambore", Arial, sans-serif;
     color: #fff;
     background: var(--red);
@@ -577,7 +577,7 @@ scary movie reference...*/
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.big-cta:hover {
+.big-cta:hover, .hero button:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 0 #000;
 }
