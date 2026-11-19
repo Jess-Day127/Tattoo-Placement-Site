@@ -369,33 +369,36 @@ window.setTransformEnabled = setTransformEnabled;
 })();
 
 
-// Stencil Before -> After Scroll
+// Stencil Before -> After Scroll - WORKS AGAIN
 (() => {
-  const uploadSection = document.querySelector('.upload-section');
   const afterLayer = document.getElementById('afterLayer');
   const afterImg = document.getElementById('afterImg');
-  if (!uploadSection || !afterLayer || !afterImg) return;
+  if (!afterLayer || !afterImg) return;
 
-  gsap.set("#afterLayer", { xPercent: 100 });
-  gsap.set("#afterImg", { xPercent: -100 });
+  // Start hidden off to the right
+  gsap.set(afterLayer, { xPercent: 100 });
+  gsap.set(afterImg, { xPercent: -100 });
 
+  // 800px of scroll to scrub through, like the working version
+  // trigger = whole page, NOT drop-area, so it doesn't run out
+  // pin: false = won't break the grid
+  // enabled: false = won't run until you convert
   const wipe = gsap.timeline({
     scrollTrigger: {
-      trigger: ".upload-section",
-      start: "top top",
-      end: "+=800",
+      trigger: 'main.upload-page',
+      start: 'top top',
+      end: '+=800',
       scrub: 1,
       pin: true,
-      anticipatePin: 1,
+      enabled: false,
       invalidateOnRefresh: true,
-      enabled: false
     },
-    defaults: { ease: "none" }
+    defaults: { ease: 'none' }
   });
 
   wipe
-    .to("#afterLayer", { xPercent: 0 }, 0)
-    .to("#afterImg", { xPercent: 0 }, 0);
+    .to(afterLayer, { xPercent: 0 }, 0)
+    .to(afterImg, { xPercent: 0 }, 0);
 
   window.wipe = wipe;
 })();
