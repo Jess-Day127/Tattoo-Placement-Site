@@ -425,7 +425,7 @@ if (document.getElementById('imgBodyArea')) {
   showStencil();
 }
 
-// --- Export: Download only ---
+// Download
 const downloadBtn = document.getElementById('downloadBtn');
 const shareStatus = document.getElementById('shareStatus');
 
@@ -546,3 +546,32 @@ if (painToggle) {
     updatePainOverlay();
   });
 }
+
+// Mobile toolBar
+const toolBtns = document.querySelectorAll('.tool-btn[data-panel]');
+const allPanels = document.querySelectorAll('.flip-tools, .transp-tools, .body-area-dropdown, .skin-tone, .body-type, .pain-overlay, .export-tools');
+
+function closeAllPanels() {
+  allPanels.forEach(p => p.classList.remove('open'));
+  toolBtns.forEach(b => b.classList.remove('active'));
+}
+
+toolBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel = document.querySelector('.' + btn.dataset.panel);
+    const wasOpen = panel.classList.contains('open');
+    closeAllPanels();
+    if (!wasOpen) {
+      panel.classList.add('open');
+      btn.classList.add('active');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+});
+
+const mobileFlipBtn = document.getElementById('mobileFlipBtn');
+mobileFlipBtn?.addEventListener('click', () => {
+  const realFlipBtn = document.querySelector('.flip-tools button');
+  if (realFlipBtn) realFlipBtn.click();
+  mobileFlipBtn.classList.toggle('active');
+});

@@ -4,11 +4,10 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
 (() => {
   const items = gsap.utils.toArray(".item");
   const details = document.querySelector('.detail');
-  if (!items.length || !details) return; // <-- FIX: skip on try-on + upload, don't crash
+  if (!items.length || !details) return;
 
   const detailContent = document.querySelector('.detail .content');
   const detailImage = document.querySelector('.detail img');
-  const detailTitle = document.querySelector('.detail .title');
 
   let activeItem;
 
@@ -32,7 +31,6 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
     const data = item.dataset;
     detailImage.addEventListener("load", onLoad);
     detailImage.src = item.querySelector('img').src;
-    detailTitle.innerText = data.title;
     gsap.to(items, { opacity: 0.3, stagger: { amount: 0.7, from: items.indexOf(item), grid: "auto" } });
     activeItem = item;
   }
@@ -71,7 +69,7 @@ gsap.registerPlugin(Flip, Draggable, ScrollTrigger);
   const stencilImg = document.getElementById('imgStencil');
   const resizeHandle = document.getElementById('resizeHandle');
   const rotateHandle = document.getElementById('rotateHandle');
-  if (!stage || !box || !stencilImg || !resizeHandle || !rotateHandle) return; // skip on home + upload
+  if (!stage || !box || !stencilImg || !resizeHandle || !rotateHandle) return;
 
 
   const saved = sessionStorage.getItem('stencil');
@@ -107,19 +105,19 @@ window.setTransformEnabled = setTransformEnabled;
   function clampToStage() {
     const stageRect = stage.getBoundingClientRect();
     const boxRect = box.getBoundingClientRect();
-    // How far is the box centre from the stage centre right now?
+  
     const boxCx = boxRect.left + boxRect.width / 2;
     const boxCy = boxRect.top + boxRect.height / 2;
     const stageCx = stageRect.left + stageRect.width / 2;
     const stageCy = stageRect.top + stageRect.height / 2;
-    // How far CAN it go before an edge hits?
+
     const maxDx = Math.max(0, (stageRect.width - boxRect.width) / 2);
     const maxDy = Math.max(0, (stageRect.height - boxRect.height) / 2);
     let dx = boxCx - stageCx;
     let dy = boxCy - stageCy;
     dx = Math.max(-maxDx, Math.min(maxDx, dx));
     dy = Math.max(-maxDy, Math.min(maxDy, dy));
-    // Push it back by the difference
+
     const curX = gsap.getProperty(box, 'x');
     const curY = gsap.getProperty(box, 'y');
     gsap.set(box, {
@@ -175,7 +173,7 @@ window.setTransformEnabled = setTransformEnabled;
   if (!box.contains(e.target)) deselect();
 });
 
-    // Sliders & Undo/Redo
+  // Sliders & Undo/Redo
   const posX = document.getElementById('posX');
   const posY = document.getElementById('posY');
   const rotSlider = document.getElementById('rotSlider');
@@ -242,9 +240,8 @@ window.setTransformEnabled = setTransformEnabled;
 
   function bindSlider(el, fn) {
     if (!el) return;
-    el.addEventListener('pointerdown', () => saveState()); // before
+    el.addEventListener('pointerdown', () => saveState());
     el.addEventListener('input', () => { fn(parseFloat(el.value)); syncSliders(); });
-    // delete the 'change' saveState
   }
 
   bindSlider(posX, v => { gsap.set(box, { x: v }); clampToStage(); updateStencilMask(); });
@@ -280,15 +277,11 @@ window.setTransformEnabled = setTransformEnabled;
       const el = document.getElementById(id);
       if (el) el.disabled = !enabled;
     });
-    // Also grey out the whole left column so it's obvious
+  
     document.querySelector('.left-column')?.classList.toggle('controls-disabled', !enabled);
   }
 
-  // --- OG PATTERN: Drag box + Resize handle (top,left) + Rotate handle ---
-  // Order matters: create box first, then handles.
-
   function positionHandles() {
-    // Resize handle ONLY - rotate is now CSS-centered, don't touch it
     gsap.set(resizeHandle, { x: 0, y: 0, left: box.offsetWidth - 8, top: box.offsetHeight - 8 });
   }
 
@@ -297,8 +290,6 @@ window.setTransformEnabled = setTransformEnabled;
     type: 'x,y',
     bounds: stage,
     onPress(e) {
-      // CRITICAL: if touch started on a handle, cancel box drag immediately
-      // GSAP fires this before the handle's own pointerdown, so stopPropagation in the handle is too late
       if (e.target.closest('#resizeHandle, #rotateHandle')) {
         this.endDrag();
         return false;
@@ -306,17 +297,15 @@ window.setTransformEnabled = setTransformEnabled;
       select();
     },
     onDrag() { clampToStage(); syncSliders(); updateStencilMask(); },
-    // DON'T call positionHandles() here - it desyncs the resize Draggable
     onRelease() { clampToStage(); saveState(); syncSliders(); updateStencilMask(); positionHandles(); }
   });
 
-  // RESIZE - OG style: type "top,left"
+  // RESIZE
   Draggable.create(resizeHandle, {
     type: 'top,left',
     onPress(e) {
-      e.stopPropagation(); // cancel drag - THIS is the OG trick
+      e.stopPropagation();
       select();
-      // Start from current size - this.x / this.y will be left/top
     },
     onDrag(e) {
       const newWidth = Math.max(40, Math.min(
@@ -324,7 +313,6 @@ window.setTransformEnabled = setTransformEnabled;
         this.x + 14
       ));
       gsap.set(box, { width: newWidth, scale: 1 });
-      // Move BOTH handles - resize to corner, rotate to new centre
       gsap.set(resizeHandle, { left: newWidth - 16, top: newWidth - 16 });
       clampToStage();
       syncSliders();
@@ -338,7 +326,7 @@ window.setTransformEnabled = setTransformEnabled;
     }
   });
 
-    // ROTATE - plain pointer
+    // ROTATE 
   let rotatePointerId = null;
   let rotateStartAngle = 0;
   let rotateStartRotation = 0;
@@ -354,7 +342,6 @@ window.setTransformEnabled = setTransformEnabled;
     rotateStartRotation = gsap.getProperty(stencilImg, 'rotation');
   });
 
-  // Use stage, not window - window pointermove gets swallowed by sticky container on mobile Safari
   stage.addEventListener('pointermove', (e) => {
     if (rotatePointerId === null || e.pointerId !== rotatePointerId) return;
     e.preventDefault();
@@ -376,19 +363,15 @@ window.setTransformEnabled = setTransformEnabled;
   stage.addEventListener('pointerup', endRotate);
   stage.addEventListener('pointercancel', endRotate);
 
-  // These lines were missing too - they set up the handles + undo
   positionHandles();
   saveState();
   window.saveStencilState = saveState;
   syncSliders();
   updateUndoButtons();
   select();
-})(); // <-- THIS closes the Drag / Resize / Rotate block
+})(); 
 
-// Before/After - wheel drives ONLY the wipe, page NEVER moves
-
-
-// Before/After - wheel drives ONLY the wipe, page NEVER moves
+// Before/After Scroll
 (() => {
   const afterLayer = document.getElementById('afterLayer');
   const afterImg = document.getElementById('afterImg');
@@ -397,14 +380,13 @@ window.setTransformEnabled = setTransformEnabled;
   gsap.set(afterLayer, { clearProps: 'transform,xPercent,x' });
   gsap.set(afterImg, { clearProps: 'transform,xPercent,x' });
 
-  let target = 0;   // where the wheel wants to go
-  let current = 0;  // where we actually are - eased toward target
+  let target = 0;  
+  let current = 0;  
   let enabled = false;
 
-  // Reveal from RIGHT -> LEFT (same as your original working wipe)
-  // left-inset shrinks, so checkerboard grows in from the right edge
+
   function render() {
-    current += (target - current) * 0.12; // smoothing - this is the scrub
+    current += (target - current) * 0.12; // smoothing 
     if (Math.abs(target - current) < 0.001) current = target;
     afterLayer.style.clipPath = `inset(0% 0% 0% ${(1 - current) * 100}%)`;
   }
@@ -443,12 +425,12 @@ window.setTransformEnabled = setTransformEnabled;
 
 gsap.registerPlugin(ScrollTrigger);
 
-// OG animation - desktop only. Mobile gets normal scroll.
+
 const mm = gsap.matchMedia();
 
 mm.add("(min-width: 601px)", () => {
   const panels = gsap.utils.toArray(".section");
-  panels.pop(); // don't pin the last one (FAQ) so footer shows
+  panels.pop(); 
 
   panels.forEach((panel) => {
     const inner = panel.querySelector(".section-inner");
@@ -458,7 +440,6 @@ mm.add("(min-width: 601px)", () => {
     const windowHeight = window.innerHeight;
     const difference = panelHeight - windowHeight;
 
-    // ratio for fake-scrolling if panel is taller than window (Features)
     const fakeScrollRatio = difference > 0 ? (difference / (difference + windowHeight)) : 0;
 
     if (fakeScrollRatio) {

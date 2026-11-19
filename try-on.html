@@ -55,6 +55,44 @@
             <button id="redo-button">Redo</button>
             <button id="resetStencilBtn">Reset Stencil</button>
         </div>
+
+        <div class="mobile-tools">
+            <button class="tool-btn tool-flip" id="mobileFlipBtn">
+                <span class="tool-icon">↔</span>
+                <span class="tool-label">Flip</span>
+            </button>
+
+            <button class="tool-btn" data-panel="transp-tools">
+                <span class="tool-icon">◐</span>
+                <span class="tool-label">Fade</span>
+            </button>
+
+            <button class="tool-btn" data-panel="body-area-dropdown">
+                <span class="tool-icon">◎</span>
+                <span class="tool-label">Area</span>
+            </button>
+
+            <button class="tool-btn" data-panel="skin-tone">
+                <span class="tool-icon">◑</span>
+                <span class="tool-label">Skin</span>
+            </button>
+
+            <button class="tool-btn" data-panel="body-type">
+                <span class="tool-icon">♟</span>
+                <span class="tool-label">Body</span>
+            </button>
+
+            <button class="tool-btn" data-panel="pain-overlay">
+                <span class="tool-icon">●</span>
+                <span class="tool-label">Pain</span>
+            </button>
+
+            <button class="tool-btn" data-panel="export-tools">
+                <span class="tool-icon">⤓</span>
+                <span class="tool-label">Save</span>
+            </button>
+        </div>
+
     </section>
 
     <section class="try-on-container">
@@ -122,12 +160,6 @@
                 <div class="pain-scale-labels">
                     <span>Least</span>
                     <span>Most</span>
-                </div>
-                <div class="pain-scale-ticks">
-                    <span class="dot dot-blue"></span><span>Low</span>
-                    <span class="dot dot-yellow"></span><span>Med</span>
-                    <span class="dot dot-orange"></span><span>High</span>
-                    <span class="dot dot-red"></span><span>Ouch</span>
                 </div>
             </div>
         </div>
