@@ -170,10 +170,10 @@ window.setTransformEnabled = setTransformEnabled;
     rotateHandle.classList.remove('visible');
   }
 
-  box.addEventListener('pointerdown', select);
   document.addEventListener('pointerdown', (e) => {
-    if (!box.contains(e.target)) deselect();
-  });
+  if (e.target.closest('#resizeHandle, #rotateHandle')) return;
+  if (!box.contains(e.target)) deselect();
+});
 
     // Sliders & Undo/Redo
   const posX = document.getElementById('posX');
@@ -284,89 +284,110 @@ window.setTransformEnabled = setTransformEnabled;
     document.querySelector('.left-column')?.classList.toggle('controls-disabled', !enabled);
   }
 
+  // --- OG PATTERN: Drag box + Resize handle (top,left) + Rotate handle ---
+  // Order matters: create box first, then handles.
+
+  function positionHandles() {
+    const w = box.offsetWidth;
+    gsap.set(resizeHandle, { x: 0, y: 0, left: w - 10, top: w - 10 });
+    gsap.set(rotateHandle, { x: 0, y: 0, left: w / 2 - 10, top: -40 });
+  }
+
+
   Draggable.create(box, {
     type: 'x,y',
     bounds: stage,
-    onPress() { select(); },
+    onPress(e) {
+      // CRITICAL: if touch started on a handle, cancel box drag immediately
+      // GSAP fires this before the handle's own pointerdown, so stopPropagation in the handle is too late
+      if (e.target.closest('#resizeHandle, #rotateHandle')) {
+        this.endDrag();
+        return false;
+      }
+      select();
+    },
     onDrag() { clampToStage(); syncSliders(); updateStencilMask(); },
-    onRelease() { clampToStage(); saveState(); syncSliders(); updateStencilMask(); }
+    // DON'T call positionHandles() here - it desyncs the resize Draggable
+    onRelease() { clampToStage(); saveState(); syncSliders(); updateStencilMask(); positionHandles(); }
   });
 
+  // RESIZE - OG style: type "top,left"
   Draggable.create(resizeHandle, {
-    type: 'x,y',
-    trigger: resizeHandle,
+    type: 'top,left',
     onPress(e) {
-      e.stopPropagation();
+      e.stopPropagation(); // cancel drag - THIS is the OG trick
       select();
-      startWidth = box.offsetWidth;
-      const c = boxCentre();
-      centre = c;
-      startDist = Math.hypot(
-        e.clientX - c.stageRect.left - c.cx,
-        e.clientY - c.stageRect.top - c.cy
-      ) || 1;
+      // Start from current size - this.x / this.y will be left/top
     },
     onDrag(e) {
-      const { cx, cy, stageRect } = boxCentre();
-      const dist = Math.hypot(
-        e.clientX - stageRect.left - cx,
-        e.clientY - stageRect.top - cy
-      );
-      const maxSize = Math.min(stageRect.width, stageRect.height);
-      const newWidth = Math.max(40, Math.min(maxSize, startWidth * (dist / startDist)));
+      const newWidth = Math.max(40, Math.min(
+        Math.min(stage.offsetWidth, stage.offsetHeight),
+        this.x + 14
+      ));
       gsap.set(box, { width: newWidth, scale: 1 });
-      gsap.set(resizeHandle, { x: 0, y: 0 });
+      // Move BOTH handles - resize to corner, rotate to new centre
+      gsap.set(resizeHandle, { left: newWidth - 16, top: newWidth - 16 });
+      gsap.set(rotateHandle, { left: newWidth / 2 - 16, top: -40 });
       clampToStage();
       syncSliders();
       updateStencilMask();
     },
     onRelease() {
-      gsap.set(resizeHandle, { x: 0, y: 0 });
       saveState();
       syncSliders();
       updateStencilMask();
+      positionHandles();
     }
   });
-  
 
-  Draggable.create(rotateHandle, {
-    type: 'x,y',
-    trigger: rotateHandle,
-    onPress(e) {
-      e.stopPropagation();
-      select();
-      const { cx, cy, stageRect } = boxCentre();
-      startAngle = Math.atan2(
-        e.clientY - stageRect.top - cy,
-        e.clientX - stageRect.left - cx
-      );
-      startRotation = gsap.getProperty(stencilImg, 'rotation');
-    },
-    onDrag(e) {
-      const { cx, cy, stageRect } = boxCentre();
-      const now = Math.atan2(
-        e.clientY - stageRect.top - cy,
-        e.clientX - stageRect.left - cx
-      );
-      const delta = (now - startAngle) * 180 / Math.PI;
-      gsap.set(stencilImg, { rotation: startRotation + delta });
-      gsap.set(rotateHandle, { x: 0, y: 0 });
-      syncSliders();
-      updateStencilMask();
-    },
-    onRelease() {
-      gsap.set(rotateHandle, { x: 0, y: 0 });
-      saveState();
-      syncSliders();
-      updateStencilMask();
-    }
+    // ROTATE - plain pointer
+  let rotatePointerId = null;
+  let rotateStartAngle = 0;
+  let rotateStartRotation = 0;
+
+  rotateHandle.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    select();
+    rotatePointerId = e.pointerId;
+    try { rotateHandle.setPointerCapture(e.pointerId); } catch(err) {}
+    const { cx, cy, stageRect } = boxCentre();
+    rotateStartAngle = Math.atan2(e.clientY - stageRect.top - cy, e.clientX - stageRect.left - cx);
+    rotateStartRotation = gsap.getProperty(stencilImg, 'rotation');
   });
+
+  // Use stage, not window - window pointermove gets swallowed by sticky container on mobile Safari
+  stage.addEventListener('pointermove', (e) => {
+    if (rotatePointerId === null || e.pointerId !== rotatePointerId) return;
+    e.preventDefault();
+    const { cx, cy, stageRect } = boxCentre();
+    const now = Math.atan2(e.clientY - stageRect.top - cy, e.clientX - stageRect.left - cx);
+    const delta = (now - rotateStartAngle) * 180 / Math.PI;
+    gsap.set(stencilImg, { rotation: rotateStartRotation + delta });
+    syncSliders();
+    updateStencilMask();
+  }, { passive: false });
+
+  function endRotate(e) {
+    if (rotatePointerId === null || e.pointerId !== rotatePointerId) return;
+    rotatePointerId = null;
+    saveState();
+    syncSliders();
+    updateStencilMask();
+  }
+    stage.addEventListener('pointerup', endRotate);
+  stage.addEventListener('pointercancel', endRotate);
+
+  // These lines were missing too - they set up the handles + undo
+  positionHandles();
   saveState();
   window.saveStencilState = saveState;
   syncSliders();
   updateUndoButtons();
   select();
-})();
+})(); // <-- THIS closes the Drag / Resize / Rotate block
+
+// Before/After - wheel drives ONLY the wipe, page NEVER moves
 
 
 // Before/After - wheel drives ONLY the wipe, page NEVER moves
